@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { storage, STORAGE_KEYS } from '../lib/utils';
-import type { DossierCompetences } from '../lib/schemas';
+import { storage, STORAGE_KEYS } from '../lib/utils.ts';
+import type { DossierCompetences } from '../lib/schemas.ts';
 import CopyableField from '../components/CopyableField';
 import CopyableList from '../components/CopyableList';
 import CopyableExperiencesCles from '../components/CopyableExperiencesCles';

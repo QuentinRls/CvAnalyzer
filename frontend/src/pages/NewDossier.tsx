@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { postExtract } from '../lib/api';
-import { storage, STORAGE_KEYS, errorHelpers } from '../lib/utils';
+import { postExtract } from '../lib/api.ts';
+import { storage, STORAGE_KEYS, errorHelpers } from '../lib/utils.ts';
 import Header from '../components/Header';
 import AnalysisLoading from '../components/AnalysisLoading';
 import FileUpload from '../components/FileUpload';

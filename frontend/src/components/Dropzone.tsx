@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
-import { fileHelpers } from '../lib/utils';
+import { fileHelpers } from '../lib/utils.ts';
 
 interface DropzoneProps {
   onFile: (file: File) => void | Promise<void>;
