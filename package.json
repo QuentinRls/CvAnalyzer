@@ -1,0 +1,12 @@
+{
+  "name": "cv-analyzer-fullstack",
+  "version": "1.0.0",
+  "description": "CV Analyzer with FastAPI backend and React frontend",
+  "scripts": {
+    "build": "cd frontend && npm ci && npm run build",
+    "start": "python main.py"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

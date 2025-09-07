@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Charger le fichier .env
@@ -32,6 +34,11 @@ app.add_middleware(
 
 # Include routes
 app.include_router(router)
+
+# Configuration pour servir les fichiers statiques du frontend
+frontend_dist_path = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if frontend_dist_path.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend")
 
 
 @app.exception_handler(HTTPException)
@@ -70,9 +77,9 @@ async def shutdown_event():
     logger.info("CV2Dossier API shutting down...")
 
 
-@app.get("/")
+@app.get("/api")
 async def root():
-    """Root endpoint"""
+    """API root endpoint"""
     return {
         "message": "CV to Dossier de Compétences API",
         "version": "0.1.0",
