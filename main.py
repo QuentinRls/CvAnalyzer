@@ -32,7 +32,17 @@ if __name__ == "__main__":
     
     print(f"🚀 Démarrage du serveur sur le port {port}")
     print(f"📁 Répertoire backend: {backend_dir}")
-    print(f"🔑 OpenAI configuré: {bool(os.environ.get('OPENAI_API_KEY'))}")
+    
+    # Vérifier la configuration OpenAI
+    openai_key = os.environ.get('OPENAI_API_KEY')
+    if openai_key:
+        print(f"🔑 OpenAI configuré: ✅")
+    else:
+        print(f"🔑 OpenAI configuré: ❌ (OPENAI_API_KEY non définie)")
+        print("⚠️  L'extraction de CV ne fonctionnera pas sans clé API OpenAI")
+    
+    print("💡 Pour configurer OpenAI, définissez la variable d'environnement OPENAI_API_KEY")
+    print("🌐 L'application va démarrer. API disponible sur /docs")
     
     # Démarrage de l'application
     uvicorn.run(

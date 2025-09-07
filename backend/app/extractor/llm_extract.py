@@ -178,8 +178,12 @@ EXTRACTION_SCHEMA = {
 }
 
 
-# OpenAI Client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+def get_openai_client():
+    """Get OpenAI client, raising error if API key not configured"""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY environment variable must be set")
+    return OpenAI(api_key=api_key)
 
 
 @retry(
@@ -192,6 +196,7 @@ def call_openai_extraction(cv_text: str) -> dict:
     logger.info("Calling OpenAI API for CV extraction")
     
     try:
+        client = get_openai_client()
         response = client.chat.completions.create(
             model="gpt-5",
             messages=[
