@@ -1,0 +1,340 @@
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+interface ExperienceProfessionnelleData {
+  client?: string;
+  intitule_poste?: string;
+  date_debut?: string;
+  date_fin?: string;
+  contexte?: string;
+  responsabilites?: string[];
+  livrables?: string[];
+  environnement_technique?: string[];
+}
+
+interface CopyableExperienceProfessionnelleProps {
+  experience: ExperienceProfessionnelleData;
+  index: number;
+}
+
+export default function CopyableExperienceProfessionnelle({ 
+  experience, 
+  index 
+}: CopyableExperienceProfessionnelleProps) {
+  const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  // Bloc 1 : En-tête (Client, Poste, Dates)
+  const formatBloc1 = () => {
+    const parts = [];
+    if (experience.client) parts.push(experience.client);
+    if (experience.intitule_poste) parts.push(experience.intitule_poste);
+    if (experience.date_debut && experience.date_fin) {
+      const dateFin = experience.date_fin === 'en_cours' ? 'En cours' : experience.date_fin;
+      parts.push(`De ${experience.date_debut} à ${dateFin}`);
+    }
+    return parts.join('\n');
+  };
+
+  // Bloc 2 : Contexte (sans le mot "Contexte")
+  const formatBloc2 = () => {
+    return experience.contexte || '';
+  };
+
+  // Bloc 3 : Responsabilités (sans le mot "Responsabilités", sans bullet points)
+  const formatBloc3 = () => {
+    if (!experience.responsabilites || experience.responsabilites.length === 0) return '';
+    return experience.responsabilites.join('\n');
+  };
+
+  // Bloc 4 : Livrables (sans le mot "Livrables", sans bullet points)
+  const formatBloc4 = () => {
+    if (!experience.livrables || experience.livrables.length === 0) return '';
+    return experience.livrables.join('\n');
+  };
+
+  // Bloc 5 : Environnement technique (sans le mot "Environnement technique", sans bullet points)
+  const formatBloc5 = () => {
+    if (!experience.environnement_technique || experience.environnement_technique.length === 0) return '';
+    return experience.environnement_technique.join('\n');
+  };
+
+  // Expérience complète (format original avec titres)
+  const formatExperience = () => {
+    const parts = [];
+    
+    // En-tête principal
+    if (experience.client) parts.push(experience.client);
+    if (experience.intitule_poste) parts.push(experience.intitule_poste);
+    
+    // Dates
+    if (experience.date_debut && experience.date_fin) {
+      const dateFin = experience.date_fin === 'en_cours' ? 'En cours' : experience.date_fin;
+      parts.push(`De ${experience.date_debut} à ${dateFin}`);
+    }
+    
+    // Contexte
+    if (experience.contexte) {
+      parts.push('Contexte.');
+      parts.push(experience.contexte);
+    }
+    
+    // Responsabilités
+    if (experience.responsabilites && experience.responsabilites.length > 0) {
+      parts.push('Responsabilités.');
+      experience.responsabilites.forEach(resp => parts.push(`${resp}`));
+    }
+    
+    // Livrables
+    if (experience.livrables && experience.livrables.length > 0) {
+      parts.push('Livrables.');
+      experience.livrables.forEach(livrable => parts.push(`${livrable}`));
+    }
+    
+    // Environnement technique
+    if (experience.environnement_technique && experience.environnement_technique.length > 0) {
+      parts.push('Environnement technique.');
+      const groupedTech = experience.environnement_technique.join(', ');
+      parts.push(`- ${groupedTech}`);
+    }
+    
+    return parts.join('\n');
+  };
+
+  const handleCopyBloc = async (blocNumber: number, content: string, label: string) => {
+    if (!content.trim()) {
+      toast.error(`${label} est vide`);
+      return;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied({ ...copied, [`bloc${blocNumber}`]: true });
+      toast.success(`${label} copié !`);
+      setTimeout(() => setCopied({ ...copied, [`bloc${blocNumber}`]: false }), 2000);
+    } catch (error) {
+      toast.error('Erreur lors de la copie');
+    }
+  };
+
+  const handleCopyAll = async () => {
+    try {
+      const fullText = formatExperience();
+      await navigator.clipboard.writeText(fullText);
+      setCopied({ ...copied, all: true });
+      toast.success('Expérience complète copiée !');
+      setTimeout(() => setCopied({ ...copied, all: false }), 2000);
+    } catch (error) {
+      toast.error('Erreur lors de la copie');
+    }
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-lg bg-white">
+      {/* En-tête collapsable */}
+      <div 
+        className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-100"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <h3 className="text-lg font-semibold text-gray-900">
+          Expérience Professionnelle {index + 1}
+          {experience.client && ` - ${experience.client}`}
+          {experience.intitule_poste && ` (${experience.intitule_poste})`}
+        </h3>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCopyAll();
+            }}
+            className={`px-3 py-1 text-xs rounded-md transition-all duration-200 ${
+              copied.all 
+                ? 'bg-green-100 text-green-600' 
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+            title="Copier toute l'expérience au format détaillé"
+          >
+            {copied.all ? 'Complète copiée !' : 'Copier complète'}
+          </button>
+          <button 
+            className="p-1 rounded-md hover:bg-gray-200 transition-colors"
+            aria-label={isExpanded ? 'Réduire' : 'Développer'}
+          >
+            <svg 
+              className={`w-5 h-5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Contenu collapsable */}
+      {isExpanded && (
+        <div className="p-6">
+          {/* Boutons de copie par blocs */}
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg border">
+            <h4 className="text-sm font-medium text-blue-900 mb-3">Copie par blocs :</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+              {/* Bloc 1 : En-tête */}
+              <button
+                onClick={() => handleCopyBloc(1, formatBloc1(), "En-tête")}
+                disabled={!formatBloc1().trim()}
+                className={`px-3 py-2 text-xs rounded-md transition-all duration-200 ${
+                  copied.bloc1 
+                    ? 'bg-green-100 text-green-600' 
+                    : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {copied.bloc1 ? 'Copié !' : 'Bloc 1: En-tête'}
+              </button>
+
+              {/* Bloc 2 : Contexte */}
+              <button
+                onClick={() => handleCopyBloc(2, formatBloc2(), "Contexte")}
+                disabled={!formatBloc2().trim()}
+                className={`px-3 py-2 text-xs rounded-md transition-all duration-200 ${
+                  copied.bloc2 
+                    ? 'bg-green-100 text-green-600' 
+                    : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {copied.bloc2 ? 'Copié !' : 'Bloc 2: Contexte'}
+              </button>
+
+              {/* Bloc 3 : Responsabilités */}
+              <button
+                onClick={() => handleCopyBloc(3, formatBloc3(), "Responsabilités")}
+                disabled={!formatBloc3().trim()}
+                className={`px-3 py-2 text-xs rounded-md transition-all duration-200 ${
+                  copied.bloc3 
+                    ? 'bg-green-100 text-green-600' 
+                    : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {copied.bloc3 ? 'Copié !' : 'Bloc 3: Responsabilités'}
+              </button>
+
+              {/* Bloc 4 : Livrables */}
+              <button
+                onClick={() => handleCopyBloc(4, formatBloc4(), "Livrables")}
+                disabled={!formatBloc4().trim()}
+                className={`px-3 py-2 text-xs rounded-md transition-all duration-200 ${
+                  copied.bloc4 
+                    ? 'bg-green-100 text-green-600' 
+                    : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {copied.bloc4 ? 'Copié !' : 'Bloc 4: Livrables'}
+              </button>
+
+              {/* Bloc 5 : Environnement technique */}
+              <button
+                onClick={() => handleCopyBloc(5, formatBloc5(), "Environnement technique")}
+                disabled={!formatBloc5().trim()}
+                className={`px-3 py-2 text-xs rounded-md transition-all duration-200 ${
+                  copied.bloc5 
+                    ? 'bg-green-100 text-green-600' 
+                    : 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {copied.bloc5 ? 'Copié !' : 'Bloc 5: Env. technique'}
+              </button>
+            </div>
+          </div>
+
+          {/* Aperçu par blocs */}
+          <div className="mb-6 space-y-4">
+            {/* Bloc 1 Aperçu */}
+            {formatBloc1().trim() && (
+              <div 
+                className="p-3 bg-gray-50 rounded border-l-4 border-blue-200 cursor-pointer hover:bg-blue-50 transition-colors"
+                onClick={() => handleCopyBloc(1, formatBloc1(), "En-tête")}
+                title="Cliquer pour copier ce bloc"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-medium text-gray-600">Bloc 1 : En-tête</label>
+                  <span className="text-xs text-gray-500">Cliquer pour copier</span>
+                </div>
+                <div className="text-sm text-gray-700 whitespace-pre-line font-mono">
+                  {formatBloc1()}
+                </div>
+              </div>
+            )}
+
+            {/* Bloc 2 Aperçu */}
+            {formatBloc2().trim() && (
+              <div 
+                className="p-3 bg-gray-50 rounded border-l-4 border-green-200 cursor-pointer hover:bg-green-50 transition-colors"
+                onClick={() => handleCopyBloc(2, formatBloc2(), "Contexte")}
+                title="Cliquer pour copier ce bloc"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-medium text-gray-600">Bloc 2 : Contexte</label>
+                  <span className="text-xs text-gray-500">Cliquer pour copier</span>
+                </div>
+                <div className="text-sm text-gray-700 whitespace-pre-line">
+                  {formatBloc2()}
+                </div>
+              </div>
+            )}
+
+            {/* Bloc 3 Aperçu */}
+            {formatBloc3().trim() && (
+              <div 
+                className="p-3 bg-gray-50 rounded border-l-4 border-yellow-200 cursor-pointer hover:bg-yellow-50 transition-colors"
+                onClick={() => handleCopyBloc(3, formatBloc3(), "Responsabilités")}
+                title="Cliquer pour copier ce bloc"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-medium text-gray-600">Bloc 3 : Responsabilités</label>
+                  <span className="text-xs text-gray-500">Cliquer pour copier</span>
+                </div>
+                <div className="text-sm text-gray-700 whitespace-pre-line">
+                  {formatBloc3()}
+                </div>
+              </div>
+            )}
+
+            {/* Bloc 4 Aperçu */}
+            {formatBloc4().trim() && (
+              <div 
+                className="p-3 bg-gray-50 rounded border-l-4 border-purple-200 cursor-pointer hover:bg-purple-50 transition-colors"
+                onClick={() => handleCopyBloc(4, formatBloc4(), "Livrables")}
+                title="Cliquer pour copier ce bloc"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-medium text-gray-600">Bloc 4 : Livrables</label>
+                  <span className="text-xs text-gray-500">Cliquer pour copier</span>
+                </div>
+                <div className="text-sm text-gray-700 whitespace-pre-line">
+                  {formatBloc4()}
+                </div>
+              </div>
+            )}
+
+            {/* Bloc 5 Aperçu */}
+            {formatBloc5().trim() && (
+              <div 
+                className="p-3 bg-gray-50 rounded border-l-4 border-red-200 cursor-pointer hover:bg-red-50 transition-colors"
+                onClick={() => handleCopyBloc(5, formatBloc5(), "Environnement technique")}
+                title="Cliquer pour copier ce bloc"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-medium text-gray-600">Bloc 5 : Environnement technique</label>
+                  <span className="text-xs text-gray-500">Cliquer pour copier</span>
+                </div>
+                <div className="text-sm text-gray-700 whitespace-pre-line">
+                  {formatBloc5()}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

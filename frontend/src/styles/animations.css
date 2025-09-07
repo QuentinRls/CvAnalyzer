@@ -1,0 +1,126 @@
+/* Animations personnalisées */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: auto;
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: auto;
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-devoteam {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(248, 72, 93, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(248, 72, 93, 0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+/* Classes utilitaires */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-pulse-devoteam {
+  animation: pulse-devoteam 2s infinite;
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s ease-out;
+}
+
+.animate-shimmer {
+  background: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+/* Boutons avec effet Devoteam */
+.btn-devoteam {
+  @apply px-4 py-2 bg-[#F8485D] text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105 hover:shadow-lg active:scale-95;
+}
+
+.btn-devoteam:hover {
+  background-color: #e63946;
+}
+
+.btn-devoteam-outline {
+  @apply px-4 py-2 bg-white text-[#F8485D] border-2 border-[#F8485D] rounded-lg font-medium transition-all duration-200 transform hover:scale-105 hover:bg-[#F8485D] hover:text-white hover:shadow-lg active:scale-95;
+}
+
+/* Cards avec effet de survol */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+/* Indicateur de chargement Devoteam */
+.loading-devoteam {
+  background: linear-gradient(45deg, #F8485D, #e63946, #F8485D);
+  background-size: 200% 200%;
+  animation: gradient-shift 2s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
