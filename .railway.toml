@@ -1,0 +1,15 @@
+# Railway Configuration File
+# This file tells Railway to use the backend folder as root
+
+[build]
+provider = "nixpacks"
+
+[nixpacks]
+packages = ["python3", "pip", "gcc"]
+
+[start]
+cmd = "cd backend && pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+[variables]
+PYTHONPATH = "/app/backend"
+PORT = "8000"
