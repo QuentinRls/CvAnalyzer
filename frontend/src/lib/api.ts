@@ -1,0 +1,66 @@
+// API configuration and client
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+export interface ApiError {
+  error: string;
+  detail?: string;
+}
+
+class ApiClient {
+  private baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  private async handleResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+      const errorData: ApiError = await response.json().catch(() => ({
+        error: `HTTP ${response.status}: ${response.statusText}`
+      }));
+      throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    }
+
+    const contentType = response.headers.get('content-type');
+    if (contentType?.includes('application/json')) {
+      return response.json();
+    } else {
+      return response as unknown as T;
+    }
+  }
+
+  async postExtract(input: File | string) {
+    if (input instanceof File) {
+      const formData = new FormData();
+      formData.append('file', input);
+      
+      const response = await fetch(`${this.baseUrl}/api/v1/extract`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      return this.handleResponse<any>(response);
+    } else {
+      const response = await fetch(`${this.baseUrl}/api/v1/extract-text`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cv_text: input })
+      });
+      
+      return this.handleResponse<any>(response);
+    }
+  }
+
+  async healthCheck() {
+    const response = await fetch(`${this.baseUrl}/api/v1/health`);
+    return this.handleResponse<{ status: string; service: string }>(response);
+  }
+}
+
+export const apiClient = new ApiClient(API_BASE);
+
+// Convenience functions
+export const postExtract = (input: File | string) => apiClient.postExtract(input);
+export const healthCheck = () => apiClient.healthCheck();
