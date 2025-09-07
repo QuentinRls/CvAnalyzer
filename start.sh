@@ -14,19 +14,32 @@ fi
 
 echo "✅ Utilisation de: $PYTHON_CMD"
 
-# Vérification que les dépendances sont installées
-echo "📦 Vérification des dépendances Python..."
-$PYTHON_CMD -c "import fastapi, uvicorn" || {
-    echo "📦 Installation des dépendances Python..."
-    $PYTHON_CMD -m pip install -r requirements.txt || {
-        echo "❌ Erreur lors de l'installation des dépendances Python"
+# Installation de pip si nécessaire
+echo "📦 Vérification de pip..."
+if ! $PYTHON_CMD -m pip --version &> /dev/null; then
+    echo "📦 Installation de pip..."
+    if command -v curl &> /dev/null; then
+        curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+        $PYTHON_CMD get-pip.py
+        rm get-pip.py
+    elif $PYTHON_CMD -m ensurepip --version &> /dev/null 2>&1; then
+        $PYTHON_CMD -m ensurepip --upgrade
+    else
+        echo "❌ Impossible d'installer pip"
         exit 1
-    }
+    fi
+fi
+
+# Installation des dépendances Python
+echo "📦 Installation des dépendances Python..."
+$PYTHON_CMD -m pip install -r requirements.txt || {
+    echo "❌ Erreur lors de l'installation des dépendances Python"
+    exit 1
 }
 
 # Vérification que le frontend est buildé
 if [ ! -d "frontend/dist" ]; then
-    echo "� Build du frontend..."
+    echo "🔨 Build du frontend..."
     cd frontend
     npm ci || {
         echo "❌ Erreur lors de l'installation des dépendances Node.js"
