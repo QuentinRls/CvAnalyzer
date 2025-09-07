@@ -1,5 +1,24 @@
 // API configuration and client
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const getApiBase = () => {
+  // Priorité 1 : Variable d'environnement explicite
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Priorité 2 : Détection automatique en production
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      // En production, utiliser la même origine
+      return window.location.origin;
+    }
+  }
+  
+  // Priorité 3 : Développement local
+  return 'http://localhost:8000';
+};
+
+const API_BASE = getApiBase();
 
 export interface ApiError {
   error: string;
