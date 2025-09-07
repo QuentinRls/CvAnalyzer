@@ -1,8 +1,10 @@
 [phases.setup]
-nixPkgs = ["nodejs_18", "python311", "python311Packages.pip"]
+nixPkgs = ["nodejs_18", "python311", "wget", "curl"]
 
 [phases.install]
 cmds = [
+  "curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py",
+  "python3 get-pip.py --break-system-packages",
   "python3 -m pip install --break-system-packages -r requirements.txt",
   "cd frontend && npm ci"
 ]
