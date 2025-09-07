@@ -48,10 +48,17 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint for deployment"""
+    openai_key = os.getenv("OPENAI_API_KEY")
     return {
         "status": "healthy",
         "version": "0.1.0",
-        "openai_configured": bool(os.getenv("OPENAI_API_KEY"))
+        "openai_configured": bool(openai_key),
+        "openai_key_length": len(openai_key) if openai_key else 0,
+        "environment_variables": {
+            "PORT": os.getenv("PORT", "not_set"),
+            "PYTHONPATH": os.getenv("PYTHONPATH", "not_set"),
+            "openai_vars": [key for key in os.environ.keys() if 'OPENAI' in key.upper()]
+        }
     }
 
 # Configuration pour servir les fichiers statiques du frontend

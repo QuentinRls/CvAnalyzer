@@ -33,10 +33,21 @@ if __name__ == "__main__":
     print(f"🚀 Démarrage du serveur sur le port {port}")
     print(f"📁 Répertoire backend: {backend_dir}")
     
+    # Debug: Afficher toutes les variables d'environnement liées à OpenAI
+    print("🔍 Debug - Variables d'environnement:")
+    env_vars = [key for key in os.environ.keys() if 'OPENAI' in key.upper() or 'API' in key.upper()]
+    if env_vars:
+        for var in env_vars:
+            value = os.environ.get(var, '')
+            masked_value = f"{value[:8]}..." if len(value) > 8 else "***"
+            print(f"   {var} = {masked_value}")
+    else:
+        print("   ❌ Aucune variable contenant 'OPENAI' ou 'API' trouvée")
+    
     # Vérifier la configuration OpenAI
     openai_key = os.environ.get('OPENAI_API_KEY')
     if openai_key:
-        print(f"🔑 OpenAI configuré: ✅")
+        print(f"🔑 OpenAI configuré: ✅ (longueur: {len(openai_key)} caractères)")
     else:
         print(f"🔑 OpenAI configuré: ❌ (OPENAI_API_KEY non définie)")
         print("⚠️  L'extraction de CV ne fonctionnera pas sans clé API OpenAI")
