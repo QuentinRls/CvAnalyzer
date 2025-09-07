@@ -150,9 +150,3 @@ async def extract_cv_data(
     except Exception as e:
         logger.error(f"Unexpected error in extract endpoint: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy", "service": "cv-analyzer"}

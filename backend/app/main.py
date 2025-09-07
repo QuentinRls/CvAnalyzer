@@ -35,7 +35,27 @@ app.add_middleware(
 # Include routes
 app.include_router(router)
 
+@app.get("/api")
+async def root():
+    """API root endpoint"""
+    return {
+        "message": "CV to Dossier de Compétences API",
+        "version": "0.1.0",
+        "docs": "/docs"
+    }
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for deployment"""
+    return {
+        "status": "healthy",
+        "version": "0.1.0",
+        "openai_configured": bool(os.getenv("OPENAI_API_KEY"))
+    }
+
 # Configuration pour servir les fichiers statiques du frontend
+# IMPORTANT: Ceci doit être APRÈS toutes les routes API
 frontend_dist_path = Path(__file__).parent.parent.parent / "frontend" / "dist"
 if frontend_dist_path.exists():
     app.mount("/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend")
@@ -75,26 +95,6 @@ async def startup_event():
 async def shutdown_event():
     """Shutdown event handler"""
     logger.info("CV2Dossier API shutting down...")
-
-
-@app.get("/api")
-async def root():
-    """API root endpoint"""
-    return {
-        "message": "CV to Dossier de Compétences API",
-        "version": "0.1.0",
-        "docs": "/docs"
-    }
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint for deployment"""
-    return {
-        "status": "healthy",
-        "version": "0.1.0",
-        "openai_configured": bool(os.getenv("OPENAI_API_KEY"))
-    }
 
 
 if __name__ == "__main__":
