@@ -39,7 +39,7 @@ export default function Home() {
             >
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
                 Analyseur de CV
-                <span className={`text-[#F8485D] transition-all duration-300 `}>
+                <span className={`text-[#F8485D] transition-all duration-300 ${isHovered ? 'scale-105' : ''}`}>
                   {' '}Intelligent
                 </span>
               </h1>
