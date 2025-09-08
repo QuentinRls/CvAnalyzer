@@ -23,7 +23,7 @@ INSTRUCTIONS SPÉCIALES POUR LES EXPÉRIENCES PROFESSIONNELLES :
 - Le CONTEXTE doit être substantiel (3-5 phrases) expliquant : le projet, l'entreprise, les enjeux, les objectifs
 - Les RESPONSABILITÉS doivent être détaillées et techniques, avec des verbes d'action précis
 - Les LIVRABLES doivent être concrets et mesurables (applications, documents, métriques)
-- L'ENVIRONNEMENT TECHNIQUE doit lister toutes les technologies mentionnées pour cette expérience
+- L'ENVIRONNEMENT TECHNIQUE doit être organisé selon les 9 catégories de compétences techniques (language_framework, ci_cd, state_management, tests, outils, base_de_donnees_big_data, data_analytics_visualisation, collaboration, ux_ui) pour chaque expérience
 - Prioriser les expériences les plus récentes et les plus significatives
 - Reformuler les informations pour qu'elles soient professionnelles et percutantes
 
@@ -56,7 +56,7 @@ Contraintes techniques :
 - Pour les années d'expérience : calculer à partir des périodes, en nombre entier.
 - Pour les compétences techniques : utiliser uniquement les 9 catégories prévues.
 - Pour les compétences fonctionnelles : les booléens pour revue_de_code, peer_programming, qualite_des_livrables.
-- Pour les expériences : maximum 5 expériences clés récentes, puis les expériences professionnelles détaillées.
+- Pour les expériences : extraire exactement 5 expériences clés récentes (les plus pertinentes et récentes), puis les expériences professionnelles détaillées.
 
 Categories de compétences techniques obligatoires :
 - language_framework
@@ -165,7 +165,20 @@ EXTRACTION_SCHEMA = {
                     "contexte": {"type": "string"},
                     "responsabilites": {"type": "array", "items": {"type": "string"}},
                     "livrables": {"type": "array", "items": {"type": "string"}},
-                    "environnement_technique": {"type": "array", "items": {"type": "string"}}
+                    "environnement_technique": {
+                        "type": "object",
+                        "properties": {
+                            "language_framework": {"type": "array", "items": {"type": "string"}},
+                            "ci_cd": {"type": "array", "items": {"type": "string"}},
+                            "state_management": {"type": "array", "items": {"type": "string"}},
+                            "tests": {"type": "array", "items": {"type": "string"}},
+                            "outils": {"type": "array", "items": {"type": "string"}},
+                            "base_de_donnees_big_data": {"type": "array", "items": {"type": "string"}},
+                            "data_analytics_visualisation": {"type": "array", "items": {"type": "string"}},
+                            "collaboration": {"type": "array", "items": {"type": "string"}},
+                            "ux_ui": {"type": "array", "items": {"type": "string"}}
+                        }
+                    }
                 }
             }
         }
@@ -198,7 +211,7 @@ def call_openai_extraction(cv_text: str) -> dict:
     try:
         client = get_openai_client()
         response = client.chat.completions.create(
-            model="gpt-5",
+            model="gpt-5-mini",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"""Voici le CV à analyser pour créer un dossier de compétences professionnel :
@@ -211,7 +224,9 @@ CONSIGNES SPÉCIFIQUES :
 3. Détaille les responsabilités avec des verbes d'action forts et des spécificités techniques
 4. Liste tous les livrables concrets mentionnés ou implicites
 5. Recense exhaustivement l'environnement technique pour chaque expérience
-6. Priorise la qualité et la pertinence des informations extraites"""}
+6. Priorise la qualité et la pertinence des informations extraites
+7. IMPORTANT : Extrais exactement 5 expériences professionnelles clés récentes, même si certaines sont plus courtes ou moins détaillées que d'autres
+8. ENVIRONNEMENT TECHNIQUE : Structure l'environnement technique de chaque expérience selon les 9 catégories (language_framework, ci_cd, state_management, tests, outils, base_de_donnees_big_data, data_analytics_visualisation, collaboration, ux_ui)"""}
             ],
             functions=[{
                 "name": "extract_cv_data",

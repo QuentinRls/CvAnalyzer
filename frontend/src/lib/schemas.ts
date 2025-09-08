@@ -69,7 +69,7 @@ export const ExperienceProfessionnelleSchema = z.object({
   contexte: z.string().optional().default(''),
   responsabilites: z.array(z.string()).optional().default([]),
   livrables: z.array(z.string()).optional().default([]),
-  environnement_technique: z.array(z.string()).optional().default([]),
+  environnement_technique: CompetencesTechniquesSchema.optional(),
 });
 
 // Schéma principal

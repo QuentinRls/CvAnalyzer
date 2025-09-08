@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { CompetencesTechniques } from '../lib/schemas';
 
 interface ExperienceProfessionnelleData {
   client?: string;
@@ -9,7 +10,7 @@ interface ExperienceProfessionnelleData {
   contexte?: string;
   responsabilites?: string[];
   livrables?: string[];
-  environnement_technique?: string[];
+  environnement_technique?: CompetencesTechniques;
 }
 
 interface CopyableExperienceProfessionnelleProps {
@@ -53,10 +54,43 @@ export default function CopyableExperienceProfessionnelle({
     return experience.livrables.join('\n');
   };
 
-  // Bloc 5 : Environnement technique (sans le mot "Environnement technique", sans bullet points)
+  // Bloc 5 : Environnement technique (organisé par catégories)
   const formatBloc5 = () => {
-    if (!experience.environnement_technique || experience.environnement_technique.length === 0) return '';
-    return experience.environnement_technique.join('\n');
+    if (!experience.environnement_technique) return '';
+    
+    const parts: string[] = [];
+    const envTech = experience.environnement_technique;
+    
+    // Parcourir chaque catégorie et ajouter les compétences s'il y en a
+    if (envTech.language_framework?.length) {
+      parts.push(`Language Framework:\n${envTech.language_framework.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.ci_cd?.length) {
+      parts.push(`Ci Cd:\n${envTech.ci_cd.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.state_management?.length) {
+      parts.push(`State Management:\n${envTech.state_management.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.tests?.length) {
+      parts.push(`Tests:\n${envTech.tests.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.outils?.length) {
+      parts.push(`Outils:\n${envTech.outils.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.base_de_donnees_big_data?.length) {
+      parts.push(`Base De Donnees Big Data:\n${envTech.base_de_donnees_big_data.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.data_analytics_visualisation?.length) {
+      parts.push(`Data Analytics Visualisation:\n${envTech.data_analytics_visualisation.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.collaboration?.length) {
+      parts.push(`Collaboration:\n${envTech.collaboration.map(tech => `${tech}`).join(',')}`);
+    }
+    if (envTech.ux_ui?.length) {
+      parts.push(`Ux Ui:\n${envTech.ux_ui.map(tech => `${tech}`).join(',')}`);
+    }
+    
+    return parts.join('\n\n');
   };
 
   // Expérience complète (format original avec titres)
@@ -92,10 +126,47 @@ export default function CopyableExperienceProfessionnelle({
     }
     
     // Environnement technique
-    if (experience.environnement_technique && experience.environnement_technique.length > 0) {
-      parts.push('Environnement technique.');
-      const groupedTech = experience.environnement_technique.join(', ');
-      parts.push(`- ${groupedTech}`);
+    if (experience.environnement_technique) {
+      const envTech = experience.environnement_technique;
+      const techParts: string[] = [];
+      
+      // Vérifier s'il y a au moins une catégorie avec des données
+      const hasAnyTech = Object.values(envTech).some(category => Array.isArray(category) && category.length > 0);
+      
+      if (hasAnyTech) {
+        parts.push('Environnement technique.');
+        
+        // Ajouter chaque catégorie qui a des données
+        if (envTech.language_framework?.length) {
+          techParts.push(`Language Framework: ${envTech.language_framework.join(', ')}`);
+        }
+        if (envTech.ci_cd?.length) {
+          techParts.push(`CI/CD: ${envTech.ci_cd.join(', ')}`);
+        }
+        if (envTech.state_management?.length) {
+          techParts.push(`State Management: ${envTech.state_management.join(', ')}`);
+        }
+        if (envTech.tests?.length) {
+          techParts.push(`Tests: ${envTech.tests.join(', ')}`);
+        }
+        if (envTech.outils?.length) {
+          techParts.push(`Outils: ${envTech.outils.join(', ')}`);
+        }
+        if (envTech.base_de_donnees_big_data?.length) {
+          techParts.push(`Bases de données/Big Data: ${envTech.base_de_donnees_big_data.join(', ')}`);
+        }
+        if (envTech.data_analytics_visualisation?.length) {
+          techParts.push(`Data Analytics/Visualisation: ${envTech.data_analytics_visualisation.join(', ')}`);
+        }
+        if (envTech.collaboration?.length) {
+          techParts.push(`Collaboration: ${envTech.collaboration.join(', ')}`);
+        }
+        if (envTech.ux_ui?.length) {
+          techParts.push(`UX/UI: ${envTech.ux_ui.join(', ')}`);
+        }
+        
+        techParts.forEach(techPart => parts.push(`- ${techPart}`));
+      }
     }
     
     return parts.join('\n');

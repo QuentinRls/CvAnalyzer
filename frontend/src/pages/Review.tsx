@@ -369,7 +369,7 @@ export default function Review() {
                       .filter(([_, skills]) => skills && Array.isArray(skills) && skills.length > 0)
                       .map(([category, skills]) => {
                         const categoryName = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                        return `${categoryName}:\n${(skills as string[]).join(',\n')}`;
+                        return `${categoryName}:\n${(skills as string[]).map(skill => `- ${skill}`).join(',\n')}`;
                       })
                       .join('\n\n');
                     

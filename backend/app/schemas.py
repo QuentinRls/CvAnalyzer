@@ -71,7 +71,7 @@ class ExperienceProfessionnelle(BaseModel):
     contexte: str = ""
     responsabilites: List[str] = []
     livrables: List[str] = []
-    environnement_technique: List[str] = []
+    environnement_technique: CompetencesTechniques = Field(default_factory=CompetencesTechniques)
 
 
 # Modèle principal
