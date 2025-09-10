@@ -53,12 +53,21 @@ if __name__ == "__main__":
         print("⚠️  L'extraction de CV ne fonctionnera pas sans clé API OpenAI")
     
     print("💡 Pour configurer OpenAI, définissez la variable d'environnement OPENAI_API_KEY")
-    print("🌐 L'application va démarrer. API disponible sur /docs")
+    print(f"🌐 L'application va démarrer sur http://0.0.0.0:{port}")
+    print("📝 Health check disponible sur /health")
+    print("📚 Documentation API disponible sur /docs")
     
-    # Démarrage de l'application
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=port,
-        log_level="info"
-    )
+    try:
+        # Démarrage de l'application
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=port,
+            log_level="info",
+            access_log=True
+        )
+    except Exception as e:
+        print(f"❌ Erreur lors du démarrage de l'application: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
