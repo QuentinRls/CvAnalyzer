@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { CompetencesTechniques } from '../lib/schemas';
+import CopyableImage from './CopyableImage';
+import { getCompanyLogo } from '../lib/api';
 
 interface ExperienceProfessionnelleData {
   client?: string;
@@ -24,6 +26,35 @@ export default function CopyableExperienceProfessionnelle({
 }: CopyableExperienceProfessionnelleProps) {
   const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
   const [isExpanded, setIsExpanded] = useState(true);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoLoading, setLogoLoading] = useState(false);
+
+  // Charger le logo de l'entreprise via l'API
+  useEffect(() => {
+    if (experience.client) {
+      setLogoLoading(true);
+      getCompanyLogo(experience.client)
+        .then((url) => {
+          setLogoUrl(url);
+        })
+        .catch((error) => {
+          console.warn(`Erreur chargement logo ${experience.client}:`, error);
+          setLogoUrl(null);
+        })
+        .finally(() => {
+          setLogoLoading(false);
+        });
+    }
+  }, [experience.client]);
+
+  // Nettoyer l'URL du logo quand le composant se démonte
+  useEffect(() => {
+    return () => {
+      if (logoUrl) {
+        URL.revokeObjectURL(logoUrl);
+      }
+    };
+  }, [logoUrl]);
 
   // Bloc 1 : En-tête (Client, Poste, Dates)
   const formatBloc1 = () => {
@@ -316,6 +347,53 @@ export default function CopyableExperienceProfessionnelle({
               </button>
             </div>
           </div>
+
+          {/* Logo de l'entreprise */}
+          {experience.client && (
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Logo de l'entreprise :</h4>
+              <div className="flex items-center space-x-4">
+                {logoLoading ? (
+                  <div className="w-16 h-16 bg-gray-100 rounded border border-gray-300 flex items-center justify-center">
+                    <svg className="animate-spin h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </div>
+                ) : logoUrl ? (
+                  <CopyableImage
+                    src={logoUrl}
+                    alt={`Logo ${experience.client}`}
+                    title={`Logo ${experience.client} - Cliquer pour copier`}
+                    className="w-16 h-16 object-contain rounded border border-gray-200 bg-white"
+                    fallbackText={experience.client?.substring(0, 3).toUpperCase() || '???'}
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-gray-200 rounded border border-gray-300 flex items-center justify-center">
+                    <span className="text-gray-500 text-xs font-medium">
+                      {experience.client?.substring(0, 3).toUpperCase() || '???'}
+                    </span>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600">
+                    {logoLoading 
+                      ? `Chargement du logo ${experience.client}...`
+                      : logoUrl 
+                        ? `✅ Logo disponible pour ${experience.client}` 
+                        : `❌ Logo non disponible pour ${experience.client}`}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {logoLoading 
+                      ? 'Recherche en cours...'
+                      : logoUrl 
+                        ? 'Cliquez sur le logo pour le copier dans votre presse-papiers'
+                        : 'Le logo pourra être ajouté automatiquement dans les documents générés'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Aperçu par blocs */}
           <div className="mb-6 space-y-4">

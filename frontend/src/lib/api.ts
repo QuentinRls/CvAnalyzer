@@ -72,6 +72,66 @@ class ApiClient {
     }
   }
 
+  async generatePDF(dossierData: any) {
+    const response = await fetch(`${this.baseUrl}/api/v1/generate-pdf`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dossierData)
+    });
+
+    if (!response.ok) {
+      const errorData: ApiError = await response.json().catch(() => ({
+        error: `HTTP ${response.status}: ${response.statusText}`
+      }));
+      throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    }
+
+    // Return the response blob for PDF download
+    return response.blob();
+  }
+
+  async generateGoogleDocs(dossierData: any) {
+    const response = await fetch(`${this.baseUrl}/api/v1/generate-google-docs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dossierData)
+    });
+
+    if (!response.ok) {
+      const errorData: ApiError = await response.json().catch(() => ({
+        error: `HTTP ${response.status}: ${response.statusText}`
+      }));
+      throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    }
+
+    // Return the response blob for HTML download
+    return response.blob();
+  }
+
+  async generatePowerPoint(dossierData: any) {
+    const response = await fetch(`${this.baseUrl}/api/v1/generate-pptx`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(dossierData)
+    });
+
+    if (!response.ok) {
+      const errorData: ApiError = await response.json().catch(() => ({
+        error: `HTTP ${response.status}: ${response.statusText}`
+      }));
+      throw new Error(errorData.error || `Request failed with status ${response.status}`);
+    }
+
+    // Return the response blob for PPTX download
+    return response.blob();
+  }
+
   async healthCheck() {
     const response = await fetch(`${this.baseUrl}/api/v1/health`);
     return this.handleResponse<{ status: string; service: string }>(response);
@@ -82,4 +142,7 @@ export const apiClient = new ApiClient(API_BASE);
 
 // Convenience functions
 export const postExtract = (input: File | string) => apiClient.postExtract(input);
+export const generatePDF = (dossierData: any) => apiClient.generatePDF(dossierData);
+export const generateGoogleDocs = (dossierData: any) => apiClient.generateGoogleDocs(dossierData);
+export const generatePowerPoint = (dossierData: any) => apiClient.generatePowerPoint(dossierData);
 export const healthCheck = () => apiClient.healthCheck();

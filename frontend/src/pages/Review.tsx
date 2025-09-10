@@ -10,6 +10,7 @@ import CopyableExperienceProfessionnelle from '../components/CopyableExperienceP
 import CollapsableSection from '../components/CollapsableSection';
 import Header from '../components/Header';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ExportActions from '../components/ExportActions';
 import devoteamLogo from '../images/devoteam.png';
 
 export default function Review() {
@@ -67,6 +68,52 @@ export default function Review() {
       {/* Contenu principal */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto space-y-8">
+          
+          {/* Actions principales */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Actions disponibles</h2>
+                <p className="text-gray-600 text-sm">Générez des documents professionnels ou copiez les sections individuellement</p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600 flex-1">
+                  <div className="flex items-start space-x-2">
+                    <div className="w-2 h-2 bg-[#F8485D] rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <strong className="text-gray-800">PDF :</strong> Document prêt à imprimer, conserve la mise en forme
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <div className="w-2 h-2 bg-[#4285F4] rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <strong className="text-gray-800">Google Docs :</strong> Fichier HTML à ouvrir et copier dans Google Docs
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  <ExportActions 
+                    dossierData={dossierData} 
+                    className="w-full sm:w-auto"
+                  />
+                  <button
+                    onClick={handleNewAnalysis}
+                    className="
+                      bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold 
+                      py-3 px-6 rounded-xl transition-all duration-200 
+                      border border-gray-300 hover:border-gray-400
+                      w-full sm:w-auto
+                    "
+                  >
+                    Nouvelle analyse
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* En-tête */}
           {dossierData.entete && (
             <CollapsableSection title="En-tête Professionnel">
