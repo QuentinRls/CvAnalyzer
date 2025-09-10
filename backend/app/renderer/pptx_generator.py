@@ -107,11 +107,11 @@ class DevoteamPPTXGenerator:
         slide_layout = self.prs.slide_layouts[6]  # Layout vide
         slide = self.prs.slides.add_slide(slide_layout)
         
-        # Fond gris clair
+        # Fond blanc
         background = slide.background
         fill = background.fill
         fill.solid()
-        fill.fore_color.rgb = BACKGROUND_GRAY
+        fill.fore_color.rgb = RGBColor(255, 255, 255)  # Blanc
         
         # Logo Devoteam avec image
         self._add_devoteam_logo(slide, Inches(0.5), Inches(0.3), Inches(0.8))
@@ -226,11 +226,11 @@ class DevoteamPPTXGenerator:
         slide_layout = self.prs.slide_layouts[6]  # Layout vide
         slide = self.prs.slides.add_slide(slide_layout)
         
-        # Fond gris clair
+        # Fond blanc
         background = slide.background
         fill = background.fill
         fill.solid()
-        fill.fore_color.rgb = BACKGROUND_GRAY
+        fill.fore_color.rgb = RGBColor(255, 255, 255)  # Blanc
         
         # Logo Devoteam avec image
         self._add_devoteam_logo(slide, Inches(0.5), Inches(0.3), Inches(0.8))
@@ -375,11 +375,11 @@ class DevoteamPPTXGenerator:
         slide_layout = self.prs.slide_layouts[6]  # Layout vide
         slide = self.prs.slides.add_slide(slide_layout)
         
-        # Fond gris clair
+        # Fond blanc
         background = slide.background
         fill = background.fill
         fill.solid()
-        fill.fore_color.rgb = BACKGROUND_GRAY
+        fill.fore_color.rgb = RGBColor(255, 255, 255)  # Blanc
         
         # Logo Devoteam avec image
         self._add_devoteam_logo(slide, Inches(0.5), Inches(0.3), Inches(0.8))

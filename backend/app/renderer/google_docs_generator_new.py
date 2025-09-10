@@ -1,5 +1,14 @@
 """
-Générateur de contenu HTML formaté pour Google Docs - Template Devoteam
+Générateur de contenu HT    <meta charset="UTF-8">
+    <title>Dossier de Compétences</title>
+    <style>
+        body {
+            font-family: Montserrat, sans-serif;
+            line-height: 1.3;
+            margin: 40px;
+            color: #333;
+            background-color: #ffffff;
+        } pour Google Docs - Template Devoteam
 """
 from typing import List
 import logging
@@ -35,7 +44,7 @@ def generate_google_docs_html(dossier: DossierCompetences) -> str:
             line-height: 1.3;
             margin: 40px;
             color: #333;
-            background-color: #f5f5f5;
+            background-color: #ffffff;
         }
         
         .devoteam-logo {
@@ -179,7 +188,8 @@ def generate_google_docs_html(dossier: DossierCompetences) -> str:
             width: 80px;
             height: 80px;
             margin-right: 20px;
-            background-color: #f0f0f0;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
             border-radius: 5px;
             display: flex;
             align-items: center;
