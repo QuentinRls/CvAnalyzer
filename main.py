@@ -27,11 +27,16 @@ except ImportError as e:
 if __name__ == "__main__":
     import uvicorn
     
-    # Configuration du port
-    port = int(os.environ.get("PORT", 8000))
+    # Configuration du port - Railway utilise PORT, d'autres services utilisent parfois RAILWAY_PORT
+    port = int(os.environ.get("PORT", os.environ.get("RAILWAY_PORT", 8000)))
+    host = os.environ.get("HOST", "0.0.0.0")
     
-    print(f"🚀 Démarrage du serveur sur le port {port}")
+    print(f"🚀 Démarrage du serveur sur {host}:{port}")
     print(f"📁 Répertoire backend: {backend_dir}")
+    print(f"🌍 Variables d'environnement de déploiement:")
+    print(f"   PORT: {os.environ.get('PORT', 'non défini')}")
+    print(f"   RAILWAY_PORT: {os.environ.get('RAILWAY_PORT', 'non défini')}")
+    print(f"   HOST: {host}")
     
     # Debug: Afficher toutes les variables d'environnement liées à OpenAI
     print("🔍 Debug - Variables d'environnement:")
@@ -53,7 +58,7 @@ if __name__ == "__main__":
         print("⚠️  L'extraction de CV ne fonctionnera pas sans clé API OpenAI")
     
     print("💡 Pour configurer OpenAI, définissez la variable d'environnement OPENAI_API_KEY")
-    print(f"🌐 L'application va démarrer sur http://0.0.0.0:{port}")
+    print(f"🌐 L'application va démarrer sur http://{host}:{port}")
     print("📝 Health check disponible sur /health")
     print("📚 Documentation API disponible sur /docs")
     
@@ -61,7 +66,7 @@ if __name__ == "__main__":
         # Démarrage de l'application
         uvicorn.run(
             app,
-            host="0.0.0.0",
+            host=host,
             port=port,
             log_level="info",
             access_log=True

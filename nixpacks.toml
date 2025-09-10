@@ -6,6 +6,7 @@ cmds = [
   "curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py",
   "python3 get-pip.py --break-system-packages",
   "python3 -m pip install --break-system-packages -r requirements.txt",
+  "python3 -m pip install --break-system-packages -r backend/requirements.txt",
   "cd frontend && npm ci"
 ]
 
