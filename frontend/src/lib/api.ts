@@ -146,3 +146,8 @@ export const generatePDF = (dossierData: any) => apiClient.generatePDF(dossierDa
 export const generateGoogleDocs = (dossierData: any) => apiClient.generateGoogleDocs(dossierData);
 export const generatePowerPoint = (dossierData: any) => apiClient.generatePowerPoint(dossierData);
 export const healthCheck = () => apiClient.healthCheck();
+export const getCompanyLogo = (companyName: string) => {
+  // Fonction placeholder pour récupérer le logo d'une entreprise
+  // Retourne null pour l'instant
+  return Promise.resolve(null);
+};
