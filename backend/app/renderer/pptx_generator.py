@@ -113,8 +113,8 @@ class DevoteamPPTXGenerator:
         fill.solid()
         fill.fore_color.rgb = RGBColor(255, 255, 255)  # Blanc
         
-        # Logo Devoteam avec image
-        self._add_devoteam_logo(slide, Inches(0.5), Inches(0.3), Inches(0.8))
+        # Logo Devoteam avec image - positionné plus en haut et plus à gauche
+        self._add_devoteam_logo(slide, Inches(0.2), Inches(0.1), Inches(0.8))
         
         # Titre principal
         if dossier.entete and dossier.entete.intitule_poste:
@@ -153,9 +153,9 @@ class DevoteamPPTXGenerator:
                 name_para.font.color.rgb = DEVOTEAM_RED
                 name_para.font.bold = True
         
-        # Résumé professionnel (si disponible)
+        # Résumé professionnel (si disponible) - Bloc plus compact et remonté
         if dossier.entete and dossier.entete.resume_profil:
-            summary_box = slide.shapes.add_textbox(Inches(0.5), Inches(4), Inches(12), Inches(1))
+            summary_box = slide.shapes.add_textbox(Inches(0.5), Inches(3.8), Inches(5), Inches(0.8))
             summary_frame = summary_box.text_frame
             summary_frame.text = dossier.entete.resume_profil
             summary_para = summary_frame.paragraphs[0]
@@ -163,8 +163,8 @@ class DevoteamPPTXGenerator:
             summary_para.font.color.rgb = LIGHT_GRAY
             summary_para.font.italic = True
         
-        # Section gauche: Diplômes
-        diplomes_title = slide.shapes.add_textbox(Inches(0.5), Inches(5.2), Inches(5.5), Inches(0.4))
+        # Section gauche: Diplômes - remontée
+        diplomes_title = slide.shapes.add_textbox(Inches(0.5), Inches(4.8), Inches(5.5), Inches(0.4))
         diplomes_title_frame = diplomes_title.text_frame
         diplomes_title_frame.text = "Diplômes."
         diplomes_title_para = diplomes_title_frame.paragraphs[0]
@@ -183,15 +183,15 @@ class DevoteamPPTXGenerator:
                     diplome_text += f"\n{diplome.annee}"
                 diplomes_content.append(diplome_text)
             
-            diplomes_box = slide.shapes.add_textbox(Inches(0.5), Inches(5.7), Inches(5.5), Inches(1.5))
+            diplomes_box = slide.shapes.add_textbox(Inches(0.5), Inches(5.3), Inches(5.5), Inches(1.5))
             diplomes_frame = diplomes_box.text_frame
             diplomes_frame.text = "\n\n".join(diplomes_content)
             for para in diplomes_frame.paragraphs:
                 para.font.size = Pt(12)
                 para.font.color.rgb = DARK_GRAY
         
-        # Section droite: Expériences clés
-        exp_title = slide.shapes.add_textbox(Inches(7), Inches(5.2), Inches(5.5), Inches(0.4))
+        # Section droite: Expériences clés - remontée
+        exp_title = slide.shapes.add_textbox(Inches(7), Inches(2.8), Inches(5.5), Inches(0.4))
         exp_title_frame = exp_title.text_frame
         exp_title_frame.text = "Expériences clés récentes."
         exp_title_para = exp_title_frame.paragraphs[0]
@@ -199,25 +199,49 @@ class DevoteamPPTXGenerator:
         exp_title_para.font.color.rgb = DEVOTEAM_RED
         exp_title_para.font.bold = True
         
-        # Contenu des expériences clés
+        # Contenu des expériences clés avec mise en forme améliorée
         if dossier.experiences_cles_recentes:
-            exp_content = []
-            for exp in dossier.experiences_cles_recentes:
-                exp_text = ""
-                if exp.client:
-                    exp_text += f"{exp.client}"
-                if exp.intitule_poste:
-                    exp_text += f" - {exp.intitule_poste}"
-                if exp.duree:
-                    exp_text += f" - ({exp.duree})"
-                if exp.description_breve:
-                    exp_text += f"\n{exp.description_breve}"
-                exp_content.append(exp_text)
-            
-            exp_box = slide.shapes.add_textbox(Inches(7), Inches(5.7), Inches(5.5), Inches(1.5))
+            exp_box = slide.shapes.add_textbox(Inches(7), Inches(3.3), Inches(5.5), Inches(1.5))
             exp_frame = exp_box.text_frame
-            exp_frame.text = "\n\n".join(exp_content)
-            for para in exp_frame.paragraphs:
+            exp_frame.clear()  # Effacer le contenu par défaut
+            
+            for i, exp in enumerate(dossier.experiences_cles_recentes):
+                if i > 0:
+                    # Ajouter un saut de ligne entre les expériences
+                    p = exp_frame.add_paragraph()
+                    p.text = ""
+                
+                # Titre de l'expérience en gras et souligné
+                title_parts = []
+                if exp.client:
+                    title_parts.append(exp.client)
+                if exp.intitule_poste:
+                    title_parts.append(exp.intitule_poste)
+                if exp.duree:
+                    title_parts.append(f"({exp.duree})")
+                
+                if title_parts:
+                    title_text = " - ".join(title_parts) + " :"
+                    if i == 0:
+                        # Premier paragraphe
+                        exp_frame.text = title_text
+                        title_para = exp_frame.paragraphs[0]
+                    else:
+                        # Paragraphes suivants
+                        title_para = exp_frame.add_paragraph()
+                        title_para.text = title_text
+                    
+                    title_para.font.size = Pt(11)
+                    title_para.font.bold = True
+                    title_para.font.underline = True
+                    title_para.font.color.rgb = DARK_GRAY
+                
+                # Description
+                if exp.description_breve:
+                    desc_para = exp_frame.add_paragraph()
+                    desc_para.text = exp.description_breve
+                    desc_para.font.size = Pt(10)
+                    desc_para.font.color.rgb = DARK_GRAY
                 para.font.size = Pt(12)
                 para.font.color.rgb = DARK_GRAY
     
@@ -232,8 +256,8 @@ class DevoteamPPTXGenerator:
         fill.solid()
         fill.fore_color.rgb = RGBColor(255, 255, 255)  # Blanc
         
-        # Logo Devoteam avec image
-        self._add_devoteam_logo(slide, Inches(0.5), Inches(0.3), Inches(0.8))
+        # Logo Devoteam avec image - positionné plus en haut et plus à gauche
+        self._add_devoteam_logo(slide, Inches(0.2), Inches(0.1), Inches(0.8))
         
         # Titre de la slide
         title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.8), Inches(12), Inches(0.5))
@@ -255,30 +279,50 @@ class DevoteamPPTXGenerator:
         
         if dossier.competences_techniques:
             comp_tech = dossier.competences_techniques
-            tech_content = []
             
             skills_sections = [
-                ("Language framework", comp_tech.language_framework),
-                ("CI/CD", comp_tech.ci_cd),
-                ("State management", comp_tech.state_management),
-                ("Tests", comp_tech.tests),
-                ("Outils", comp_tech.outils),
-                ("Base de données/Big data", comp_tech.base_de_donnees_big_data),
-                ("Data Analytics/Visualisation", comp_tech.data_analytics_visualisation),
-                ("Collaboration", comp_tech.collaboration),
-                ("UX/UI", comp_tech.ux_ui)
+                ("Language framework :", comp_tech.language_framework),
+                ("CI/CD :", comp_tech.ci_cd),
+                ("State management :", comp_tech.state_management),
+                ("Tests :", comp_tech.tests),
+                ("Outils :", comp_tech.outils),
+                ("Base de données/Big data :", comp_tech.base_de_donnees_big_data),
+                ("Data Analytics/Visualisation :", comp_tech.data_analytics_visualisation),
+                ("Collaboration :", comp_tech.collaboration),
+                ("UX/UI :", comp_tech.ux_ui)
             ]
-            
-            for section_name, skills_list in skills_sections:
-                if skills_list:
-                    tech_content.append(f"{section_name}\n{', '.join(skills_list)}")
             
             tech_box = slide.shapes.add_textbox(Inches(0.5), Inches(2), Inches(6), Inches(5))
             tech_frame = tech_box.text_frame
-            tech_frame.text = "\n\n".join(tech_content)
-            for para in tech_frame.paragraphs:
-                para.font.size = Pt(11)
-                para.font.color.rgb = DARK_GRAY
+            tech_frame.clear()
+            
+            first_section = True
+            for section_name, skills_list in skills_sections:
+                if skills_list:
+                    if not first_section:
+                        # Ajouter un saut de ligne entre les sections
+                        p = tech_frame.add_paragraph()
+                        p.text = ""
+                    
+                    # Titre de la section en gras et souligné
+                    if first_section:
+                        tech_frame.text = section_name
+                        title_para = tech_frame.paragraphs[0]
+                        first_section = False
+                    else:
+                        title_para = tech_frame.add_paragraph()
+                        title_para.text = section_name
+                    
+                    title_para.font.size = Pt(12)
+                    title_para.font.bold = True
+                    title_para.font.underline = True
+                    title_para.font.color.rgb = DARK_GRAY
+                    
+                    # Contenu des compétences
+                    content_para = tech_frame.add_paragraph()
+                    content_para.text = ', '.join(skills_list)
+                    content_para.font.size = Pt(11)
+                    content_para.font.color.rgb = DARK_GRAY
         
         # Compétences fonctionnelles (section droite)
         func_title = slide.shapes.add_textbox(Inches(7), Inches(1.5), Inches(6), Inches(0.4))
@@ -291,16 +335,80 @@ class DevoteamPPTXGenerator:
         
         if dossier.competences_fonctionnelles:
             comp_func = dossier.competences_fonctionnelles
-            func_content = []
             
+            func_box = slide.shapes.add_textbox(Inches(7), Inches(2), Inches(6), Inches(5))
+            func_frame = func_box.text_frame
+            func_frame.clear()
+            
+            first_section = True
+            
+            # Gestion de projet
             if comp_func.gestion_de_projet:
-                func_content.append(f"Gestion de projet\n{', '.join(comp_func.gestion_de_projet)}")
+                if first_section:
+                    func_frame.text = "Gestion de projet :"
+                    title_para = func_frame.paragraphs[0]
+                    first_section = False
+                else:
+                    title_para = func_frame.add_paragraph()
+                    title_para.text = "Gestion de projet :"
+                
+                title_para.font.size = Pt(12)
+                title_para.font.bold = True
+                title_para.font.underline = True
+                title_para.font.color.rgb = DARK_GRAY
+                
+                content_para = func_frame.add_paragraph()
+                content_para.text = ', '.join(comp_func.gestion_de_projet)
+                content_para.font.size = Pt(11)
+                content_para.font.color.rgb = DARK_GRAY
             
+            # Méthodologie scrum
             if comp_func.methodologie_scrum:
-                func_content.append(f"Méthodologie scrum\n{' / '.join(comp_func.methodologie_scrum)}")
+                if not first_section:
+                    p = func_frame.add_paragraph()
+                    p.text = ""
+                
+                if first_section:
+                    func_frame.text = "Méthodologie scrum :"
+                    title_para = func_frame.paragraphs[0]
+                    first_section = False
+                else:
+                    title_para = func_frame.add_paragraph()
+                    title_para.text = "Méthodologie scrum :"
+                
+                title_para.font.size = Pt(12)
+                title_para.font.bold = True
+                title_para.font.underline = True
+                title_para.font.color.rgb = DARK_GRAY
+                
+                content_para = func_frame.add_paragraph()
+                content_para.text = ' / '.join(comp_func.methodologie_scrum)
+                content_para.font.size = Pt(11)
+                content_para.font.color.rgb = DARK_GRAY
             
+            # Encadrement
             if comp_func.encadrement:
-                func_content.append(f"Encadrement\n{comp_func.encadrement}")
+                if not first_section:
+                    p = func_frame.add_paragraph()
+                    p.text = ""
+                
+                if first_section:
+                    func_frame.text = "Encadrement :"
+                    title_para = func_frame.paragraphs[0]
+                    first_section = False
+                else:
+                    title_para = func_frame.add_paragraph()
+                    title_para.text = "Encadrement :"
+                
+                title_para.font.size = Pt(12)
+                title_para.font.bold = True
+                title_para.font.underline = True
+                title_para.font.color.rgb = DARK_GRAY
+                
+                content_para = func_frame.add_paragraph()
+                content_para.text = comp_func.encadrement
+                content_para.font.size = Pt(11)
+                content_para.font.color.rgb = DARK_GRAY
             
             # Compétences booléennes
             bool_skills = []
@@ -312,14 +420,27 @@ class DevoteamPPTXGenerator:
                 bool_skills.append("Qualité des livrables")
             
             if bool_skills:
-                func_content.append(f"Autres compétences\n{', '.join(bool_skills)}")
-            
-            func_box = slide.shapes.add_textbox(Inches(7), Inches(2), Inches(6), Inches(5))
-            func_frame = func_box.text_frame
-            func_frame.text = "\n\n".join(func_content)
-            for para in func_frame.paragraphs:
-                para.font.size = Pt(11)
-                para.font.color.rgb = DARK_GRAY
+                if not first_section:
+                    p = func_frame.add_paragraph()
+                    p.text = ""
+                
+                if first_section:
+                    func_frame.text = "Autres compétences :"
+                    title_para = func_frame.paragraphs[0]
+                    first_section = False
+                else:
+                    title_para = func_frame.add_paragraph()
+                    title_para.text = "Autres compétences :"
+                
+                title_para.font.size = Pt(12)
+                title_para.font.bold = True
+                title_para.font.underline = True
+                title_para.font.color.rgb = DARK_GRAY
+                
+                content_para = func_frame.add_paragraph()
+                content_para.text = ', '.join(bool_skills)
+                content_para.font.size = Pt(11)
+                content_para.font.color.rgb = DARK_GRAY
         
         # Section langues en bas
         if dossier.langues:
@@ -381,8 +502,8 @@ class DevoteamPPTXGenerator:
         fill.solid()
         fill.fore_color.rgb = RGBColor(255, 255, 255)  # Blanc
         
-        # Logo Devoteam avec image
-        self._add_devoteam_logo(slide, Inches(0.5), Inches(0.3), Inches(0.8))
+        # Logo Devoteam avec image - positionné plus en haut et plus à gauche
+        self._add_devoteam_logo(slide, Inches(0.2), Inches(0.1), Inches(0.8))
         
         # Titre de la slide
         title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.8), Inches(12), Inches(0.5))
