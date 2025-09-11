@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { storage, STORAGE_KEYS } from '../lib/utils.ts';
 import type { DossierCompetences } from '../lib/schemas.ts';
@@ -15,9 +15,13 @@ import devoteamLogo from '../images/devoteam.png';
 
 export default function Review() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [dossierData, setDossierData] = useState<DossierCompetences | null>(null);
   
-  const extractedData = storage.get(STORAGE_KEYS.LAST_DRAFT, null);
+  // Get session ID from URL parameters
+  const sessionId = searchParams.get('session');
+  const storageKey = sessionId ? `cv2dossier:lastDraft:${sessionId}` : STORAGE_KEYS.LAST_DRAFT;
+  const extractedData = storage.get(storageKey, null);
   
   useEffect(() => {
     if (!extractedData) {
@@ -29,8 +33,14 @@ export default function Review() {
   }, [extractedData, navigate]);
 
   const handleNewAnalysis = () => {
-    storage.remove(STORAGE_KEYS.LAST_DRAFT);
-    storage.remove(STORAGE_KEYS.LAST_EXTRACTION);
+    // Clean up current session data
+    if (sessionId) {
+      storage.remove(`cv2dossier:lastDraft:${sessionId}`);
+      storage.remove(`cv2dossier:lastExtraction:${sessionId}`);
+    } else {
+      storage.remove(STORAGE_KEYS.LAST_DRAFT);
+      storage.remove(STORAGE_KEYS.LAST_EXTRACTION);
+    }
     navigate('/new');
   };
 

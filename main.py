@@ -63,13 +63,17 @@ if __name__ == "__main__":
     print("📚 Documentation API disponible sur /docs")
     
     try:
-        # Démarrage de l'application
+        # Démarrage de l'application avec support pour les connexions concurrentes
         uvicorn.run(
             app,
             host=host,
             port=port,
             log_level="info",
-            access_log=True
+            access_log=True,
+            workers=1,  # Garde 1 worker pour éviter les conflits de state
+            limit_concurrency=10,  # Permet 10 requêtes concurrentes
+            limit_max_requests=1000,  # Limite par worker
+            timeout_keep_alive=5
         )
     except Exception as e:
         print(f"❌ Erreur lors du démarrage de l'application: {e}")

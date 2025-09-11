@@ -6,6 +6,7 @@ from datetime import datetime
 
 from .schemas import DossierCompetences, CVTextRequest, ErrorResponse
 from .extractor import extract_structured
+from .extractor.async_extract import extract_structured_async, extract_from_text_async
 from .utils import logger, CVExtractionError, LLMExtractionError
 from .renderer.pdf_generator import generate_cv_pdf
 
@@ -39,11 +40,11 @@ async def extract_cv_from_text(cv_text_request: CVTextRequest) -> DossierCompete
                 detail="CV text too short (minimum 50 characters required)"
             )
         
-        # Extract structured data
+        # Extract structured data asynchronously
         try:
-            extracted = extract_structured(cv_text=cv_text)
+            extracted = await extract_from_text_async(cv_text)
             
-            logger.info("Successfully extracted CV data from text")
+            logger.info("Successfully extracted CV data from text asynchronously")
             return extracted
             
         except LLMExtractionError as e:
@@ -135,11 +136,11 @@ async def extract_cv_data(
                 detail="CV text too short (minimum 50 characters required)"
             )
         
-        # Extract structured data
+        # Extract structured data asynchronously
         try:
-            extracted = extract_structured(cv_text=cv_text)
+            extracted = await extract_from_text_async(cv_text)
             
-            logger.info("Successfully extracted CV data")
+            logger.info("Successfully extracted CV data asynchronously")
             return extracted
             
         except LLMExtractionError as e:

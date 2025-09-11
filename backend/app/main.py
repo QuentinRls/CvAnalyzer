@@ -99,5 +99,9 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,
-        log_level="info"
+        log_level="info",
+        workers=1,  # Garde 1 worker en mode reload
+        limit_concurrency=100,  # Augmente la limite de concurrence
+        limit_max_requests=1000,  # Augmente la limite de requêtes
+        timeout_keep_alive=30  # Garde les connexions ouvertes plus longtemps
     )

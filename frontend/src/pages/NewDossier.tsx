@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { postExtract } from '../lib/api.ts';
-import { storage, STORAGE_KEYS, errorHelpers } from '../lib/utils.ts';
+import { storage, STORAGE_KEYS, errorHelpers, generateSessionKeys } from '../lib/utils.ts';
 import Header from '../components/Header';
 import AnalysisLoading from '../components/AnalysisLoading';
 import FileUpload from '../components/FileUpload';
@@ -13,6 +13,9 @@ export default function NewDossier() {
   const [analysisStage, setAnalysisStage] = useState('');
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
+  
+  // Generate unique session keys for this analysis session
+  const sessionKeys = useMemo(() => generateSessionKeys(), []);
 
   const simulateProgress = () => {
     const stages = [
@@ -49,9 +52,9 @@ export default function NewDossier() {
       const data = await postExtract(file);
       clearInterval(progressInterval);
       
-      storage.set(STORAGE_KEYS.LAST_DRAFT, data);
+      storage.set(sessionKeys.LAST_DRAFT, data);
       toast.success('CV analysé avec succès !');
-      navigate('/review');
+      navigate(`/review?session=${sessionKeys.SESSION_ID}`);
     } catch (error) {
       toast.error(errorHelpers.getErrorMessage(error));
     } finally {
@@ -72,9 +75,9 @@ export default function NewDossier() {
       const data = await postExtract(textInput);
       clearInterval(progressInterval);
       
-      storage.set(STORAGE_KEYS.LAST_DRAFT, data);
+      storage.set(sessionKeys.LAST_DRAFT, data);
       toast.success('Texte analysé avec succès !');
-      navigate('/review');
+      navigate(`/review?session=${sessionKeys.SESSION_ID}`);
     } catch (error) {
       toast.error(errorHelpers.getErrorMessage(error));
     } finally {

@@ -40,6 +40,16 @@ export const STORAGE_KEYS = {
   SETTINGS: 'cv2dossier:settings'
 } as const;
 
+// Generate unique session keys to prevent conflicts between multiple tabs
+export const generateSessionKeys = () => {
+  const sessionId = Math.random().toString(36).substring(7) + Date.now();
+  return {
+    LAST_DRAFT: `cv2dossier:lastDraft:${sessionId}`,
+    LAST_EXTRACTION: `cv2dossier:lastExtraction:${sessionId}`,
+    SESSION_ID: sessionId
+  };
+};
+
 // File helpers
 export const fileHelpers = {
   getFileExtension: (filename: string): string => {
