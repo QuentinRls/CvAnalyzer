@@ -12,4 +12,13 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  build: {
+    assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[name].[hash].[ext]'
+      }
+    }
+  },
+  publicDir: 'public'
 })
