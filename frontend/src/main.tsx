@@ -7,6 +7,7 @@ import App from './App'
 import { queryClient } from './lib/query.ts'
 import './app.css'
 
+// Force rebuild - session isolation fix v2.0
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>

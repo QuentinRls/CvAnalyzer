@@ -23,7 +23,7 @@ async def call_openai_extraction_async(cv_text: str) -> dict:
         )
         
         response = await client.chat.completions.create(
-            model="gpt-5-mini",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": f"""Voici le CV à analyser pour créer un dossier de compétences professionnel :
