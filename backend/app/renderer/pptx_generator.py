@@ -389,9 +389,9 @@ class DevoteamPPTXGenerator:
                 # Décalage vertical pour la langue suivante
                 y_circle += 0.9
 
-        # === COLONNE DROITE : EXPÉRIENCES PROFESSIONNELLES === ICI
+        # === COLONNE DROITE : EXPÉRIENCES CLÉS RÉCENTES ===
         # Section Mission Devoteam - seulement si disponible
-        if dossier.experiences_professionnelles:
+        if dossier.experiences_cles_recentes:
             # Titre de la section Mission
             mission_title = slide.shapes.add_textbox(Inches(2), Inches(2.5), Inches(5.0), Inches(0.3))
             mission_title_frame = mission_title.text_frame
@@ -407,8 +407,8 @@ class DevoteamPPTXGenerator:
             mission_frame = mission_box.text_frame
             mission_frame.clear()
             
-            # Utiliser les vraies expériences du dossier
-            for i, exp in enumerate(dossier.experiences_professionnelles[:3]):  # Limiter à 2 expériences
+            # Utiliser les expériences clés récentes du dossier
+            for i, exp in enumerate(dossier.experiences_cles_recentes[:5]):  # Limiter à 3 expériences
                 if i > 0:
                     # Saut de ligne entre expériences
                     para = mission_frame.add_paragraph()
@@ -436,9 +436,18 @@ class DevoteamPPTXGenerator:
                     para.font.name = "Montserrat"  # Titres en Montserrat normal
                     para.font.underline = True
 
-                # Description/contexte de l'expérience
-                if exp.contexte:
-                    desc_text = exp.contexte
+                # Durée de l'expérience
+                if exp.duree:
+                    para = mission_frame.add_paragraph()
+                    para.text = f"Durée : {exp.duree}"
+                    para.font.size = Pt(9)  # Texte plus petit pour la durée
+                    para.font.color.rgb = DARK_GRAY
+                    para.font.name = "Montserrat Light"  # Texte normal en Montserrat Light
+                    para.font.italic = True
+
+                # Description brève de l'expérience
+                if exp.description_breve:
+                    desc_text = exp.description_breve
                     # Ne conserver que la première phrase
                     para = mission_frame.add_paragraph()
                     para.text = self._truncate_at_first_dot(desc_text)
@@ -448,20 +457,20 @@ class DevoteamPPTXGenerator:
                 
                 # Responsabilités (utiliser des vrais bullet points PowerPoint)
                 if exp.responsabilites:
-                    for resp in exp.responsabilites:  # Limiter à 3 responsabilités
+                    for resp in exp.responsabilites[:3]:  # Limiter à 3 responsabilités maximum
                         # Afficher uniquement la première phrase de chaque responsabilité
                         para = mission_frame.add_paragraph()
                         # run pour le bullet (gras)
                         bullet_run = para.add_run()
-                        bullet_run.text = "• "
-                        bullet_run.font.size = Pt(13)
+                        bullet_run.text = "     •"
+                        bullet_run.font.size = Pt(9)
                         bullet_run.font.color.rgb = DARK_GRAY
                         bullet_run.font.name = "Montserrat"
                         bullet_run.font.bold = True
 
                         # run pour le texte de la responsabilité (normal)
                         text_run = para.add_run()
-                        text_run.text = self._truncate_at_first_dot(resp)
+                        text_run.text = "       " + self._truncate_at_first_dot(resp)
                         text_run.font.size = Pt(9)
                         text_run.font.color.rgb = DARK_GRAY
                         text_run.font.name = "Montserrat Light"  # Police normale en Montserrat Light
@@ -562,7 +571,7 @@ class DevoteamPPTXGenerator:
         # Titre de section
         tech_title = slide.shapes.add_textbox(Inches(2), Inches(1.7), Inches(6.5), Inches(0.4))
         tech_title_frame = tech_title.text_frame
-        tech_title_frame.text = "Compétences techniques."
+        tech_title_frame.text = "Compétences techniques :"
         tech_title_para = tech_title_frame.paragraphs[0]
         tech_title_para.font.size = Pt(12)  # Titre de section
         tech_title_para.font.color.rgb = DEVOTEAM_RED
@@ -662,7 +671,7 @@ class DevoteamPPTXGenerator:
             y_pos += 0.4
             func_title = slide.shapes.add_textbox(Inches(2), Inches(y_pos), Inches(6.5), Inches(0.4))
             func_title_frame = func_title.text_frame
-            func_title_frame.text = "Compétences fonctionnelles."
+            func_title_frame.text = "Compétences fonctionnelles :"
             func_title_para = func_title_frame.paragraphs[0]
             func_title_para.font.size = Pt(12)
             func_title_para.font.color.rgb = DEVOTEAM_RED
@@ -675,7 +684,7 @@ class DevoteamPPTXGenerator:
             if comp_func.gestion_de_projet:
                 proj_title = slide.shapes.add_textbox(Inches(2), Inches(y_pos), Inches(6.5), Inches(0.3))
                 proj_title_frame = proj_title.text_frame
-                proj_title_frame.text = "Gestion de projet & organisation"
+                proj_title_frame.text = "Gestion de projet & organisation :"
                 proj_title_para = proj_title_frame.paragraphs[0]
                 proj_title_para.font.size = Pt(9)
                 proj_title_para.font.color.rgb = DARK_GRAY
@@ -699,7 +708,7 @@ class DevoteamPPTXGenerator:
             if hasattr(comp_func, 'analyse_problemes') or comp_func.methodologie_scrum:
                 analysis_title = slide.shapes.add_textbox(Inches(2), Inches(y_pos), Inches(6.5), Inches(0.3))
                 analysis_title_frame = analysis_title.text_frame
-                analysis_title_frame.text = "Analyse & résolution de problèmes"
+                analysis_title_frame.text = "Analyse & résolution de problèmes :"
                 analysis_title_para = analysis_title_frame.paragraphs[0]
                 analysis_title_para.font.size = Pt(12)
                 analysis_title_para.font.color.rgb = DARK_GRAY

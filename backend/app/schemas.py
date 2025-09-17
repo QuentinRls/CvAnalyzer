@@ -17,6 +17,7 @@ class ExperienceCleRecente(BaseModel):
     intitule_poste: str = ""
     duree: str = ""
     description_breve: str = ""
+    responsabilites: List[str] = []
 
 
 # Diplômes

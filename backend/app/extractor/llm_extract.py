@@ -18,6 +18,13 @@ Sortie : un JSON **valide** qui respecte EXACTEMENT le schéma fourni.
 Tu vas fournir toutes les informations pour remplir un dossier de compétences complet.
 Réponds uniquement dans le format JSON donné, sans texte hors-JSON, en remplaçant chaque placeholder par tes données réelles (pas d'exemples ni de valeurs fictives).
 
+INSTRUCTIONS SPÉCIALES POUR LES EXPÉRIENCES CLÉS RÉCENTES :
+- Extraire 4 expériences récentes les plus marquantes et pertinentes
+- DESCRIPTION_BREVE doit être concise (2-3 phrases) résumant le contexte et l'objectif
+- RESPONSABILITÉS doivent être limitées à 2-3 points clés les plus impactants pas plus de 12 mots
+- DURÉE doit indiquer la période (ex: "6 mois", "1 an", "2022-2023")
+- Prioriser les expériences qui démontrent progression et expertise
+
 INSTRUCTIONS SPÉCIALES POUR LES EXPÉRIENCES PROFESSIONNELLES :
 - Extraire un niveau de détail élevé pour chaque expérience
 - Le CONTEXTE doit être substantiel (3-5 phrases) expliquant : le projet, l'entreprise, les enjeux, les objectifs
@@ -92,7 +99,8 @@ EXTRACTION_SCHEMA = {
                     "client": {"type": "string"},
                     "intitule_poste": {"type": "string"},
                     "duree": {"type": "string"},
-                    "description_breve": {"type": "string"}
+                    "description_breve": {"type": "string"},
+                    "responsabilites": {"type": "array", "items": {"type": "string"}}
                 }
             }
         },
