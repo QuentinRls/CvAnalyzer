@@ -781,36 +781,22 @@ class DevoteamPPTXGenerator:
         self._add_devoteam_logo(slide, Inches(0.2), Inches(0.1), Inches(0.5))
         
         # Titre principal de la slide
-        title_box = slide.shapes.add_textbox(Inches(0.5), Inches(0.8), Inches(6.5), Inches(0.5))
+        title_box = slide.shapes.add_textbox(Inches(0.5), Inches(2), Inches(6.5), Inches(0.5))
         title_frame = title_box.text_frame
         title_frame.text = "Expériences professionnelles récentes."
         title_para = title_frame.paragraphs[0]
-        title_para.font.size = Pt(24)  # Taille cohérente avec les autres slides
+        title_para.font.size = Pt(14)  # Taille cohérente avec les autres slides
         title_para.font.color.rgb = DEVOTEAM_RED
         title_para.font.bold = True
         title_para.font.name = "Montserrat"  # Titres en Montserrat normal
         
-        # === SECTION ENTREPRISE ===
-        # Logo/nom de l'entreprise (placeholder visuel)
-        company_name = exp.client or "CLIENT"
-        logo_text = company_name.upper() if len(company_name) > 6 else company_name.upper()
-        company_logo = slide.shapes.add_textbox(Inches(0.5), Inches(1.5), Inches(1.5), Inches(1))
-        company_logo_frame = company_logo.text_frame
-        company_logo_frame.text = logo_text
-        company_logo_para = company_logo_frame.paragraphs[0]
-        company_logo_para.font.size = Pt(14)
-        company_logo_para.font.color.rgb = LIGHT_GRAY  # Gris clair pour effet placeholder
-        company_logo_para.font.bold = True
-        company_logo_para.alignment = PP_ALIGN.CENTER
-        company_logo_frame.vertical_anchor = MSO_ANCHOR.MIDDLE  # Centrage vertical
-        
         # Informations de l'expérience
-        info_box = slide.shapes.add_textbox(Inches(2.2), Inches(1.5), Inches(4.8), Inches(1))
+        info_box = slide.shapes.add_textbox(Inches(0.5), Inches(2.3), Inches(4.8), Inches(4))
         info_frame = info_box.text_frame
         
         info_text = ""
         if exp.client:
-            info_text += f"Client\n"
+            info_text += f"{exp.client}\n"
         if exp.intitule_poste:
             info_text += f"{exp.intitule_poste}\n"
         if exp.date_debut or exp.date_fin:
@@ -821,11 +807,11 @@ class DevoteamPPTXGenerator:
         for i, para in enumerate(info_frame.paragraphs):
             para.font.name = "Montserrat"
             if i == 0:  # "Client"
-                para.font.size = Pt(16)
+                para.font.size = Pt(12)
                 para.font.color.rgb = DARK_GRAY
                 para.font.bold = True
             elif i == 1:  # Poste
-                para.font.size = Pt(14)
+                para.font.size = Pt(12)
                 para.font.color.rgb = DEVOTEAM_RED
                 para.font.bold = True
             else:  # Durée
@@ -836,22 +822,22 @@ class DevoteamPPTXGenerator:
         # Affichage du contexte seulement si disponible dans les données
         if exp.contexte:
             # Titre de la section contexte
-            context_title = slide.shapes.add_textbox(Inches(0.5), Inches(2.8), Inches(6.5), Inches(0.3))
+            context_title = slide.shapes.add_textbox(Inches(0.5), Inches(3.1), Inches(6.5), Inches(0.3))
             context_title_frame = context_title.text_frame
-            context_title_frame.text = "Contexte."
+            context_title_frame.text = "Contexte"
             context_title_para = context_title_frame.paragraphs[0]
-            context_title_para.font.size = Pt(16)  # Titre de section
+            context_title_para.font.size = Pt(12)  # Titre de section
             context_title_para.font.color.rgb = DEVOTEAM_RED
             context_title_para.font.bold = True
             context_title_para.font.name = "Montserrat"  # Titres en Montserrat normal
             
             # Contenu du contexte
-            context_box = slide.shapes.add_textbox(Inches(0.5), Inches(3.2), Inches(6.5), Inches(1.2))
+            context_box = slide.shapes.add_textbox(Inches(0.5), Inches(3.4), Inches(6.5), Inches(1.2))
             context_frame = context_box.text_frame
             # Ne conserver que la première phrase du contexte
-            context_frame.text = self._truncate_at_first_dot(exp.contexte)
+            context_frame.text = exp.contexte
             context_para = context_frame.paragraphs[0]
-            context_para.font.size = Pt(12)  # Texte de contexte légèrement plus grand
+            context_para.font.size = Pt(9)  # Texte de contexte légèrement plus grand
             context_para.font.color.rgb = DARK_GRAY
             context_para.font.name = "Montserrat Light"  # Texte normal en Montserrat Light
         
@@ -859,53 +845,95 @@ class DevoteamPPTXGenerator:
         # Affichage des responsabilités seulement si disponibles
         if exp.responsabilites:
             # Titre de la section responsabilités
-            resp_title = slide.shapes.add_textbox(Inches(0.5), Inches(4.6), Inches(6.5), Inches(0.3))
+            resp_title = slide.shapes.add_textbox(Inches(0.5), Inches(4.2), Inches(6.5), Inches(0.3))
             resp_title_frame = resp_title.text_frame
-            resp_title_frame.text = "Responsabilités."
+            resp_title_frame.text = "Responsabilités"
             resp_title_para = resp_title_frame.paragraphs[0]
-            resp_title_para.font.size = Pt(16)
+            resp_title_para.font.size = Pt(12)
             resp_title_para.font.color.rgb = DEVOTEAM_RED
             resp_title_para.font.bold = True
             resp_title_para.font.name = "Montserrat"  # Titres en Montserrat normal
             
             # Liste des responsabilités avec bullet points PowerPoint
             # Conserver uniquement la première phrase de chaque responsabilité
-            resp_content = "\n- ".join(self._truncate_at_first_dot(r) for r in exp.responsabilites)
-            resp_box = slide.shapes.add_textbox(Inches(0.5), Inches(5.0), Inches(6.5), Inches(2.0))
+            resp_box = slide.shapes.add_textbox(Inches(0.5), Inches(4.5), Inches(6.5), Inches(2.0))
             resp_frame = resp_box.text_frame
-            resp_frame.text = f"- {resp_content}"  # Commencer par un tiret
+            resp_frame.clear()
             
-            # Application du style à chaque bullet point
-            for para in resp_frame.paragraphs:
-                para.font.size = Pt(9)  # Taille 9 pour le texte normal (cohérent avec design)
-                para.font.color.rgb = DARK_GRAY
-                para.font.name = "Montserrat Light"  # Texte normal en Montserrat Light
+            # Créer chaque responsabilité avec le même style que dans _create_title_slide
+            for i, resp in enumerate(exp.responsabilites):
+                if i > 0:
+                    # Saut de ligne entre responsabilités
+                    para = resp_frame.add_paragraph()
+                    para.text = ""
+                
+                # Afficher uniquement la première phrase de chaque responsabilité
+                if i == 0:
+                    para = resp_frame.paragraphs[0]
+                else:
+                    para = resp_frame.add_paragraph()
+                
+                # run pour le bullet (gras)
+                bullet_run = para.add_run()
+                bullet_run.text = "     •"
+                bullet_run.font.size = Pt(9)
+                bullet_run.font.color.rgb = DARK_GRAY
+                bullet_run.font.name = "Montserrat"
+                bullet_run.font.bold = True
+
+                # run pour le texte de la responsabilité (normal)
+                text_run = para.add_run()
+                text_run.text = "       " + self._truncate_at_first_dot(resp)
+                text_run.font.size = Pt(9)
+                text_run.font.color.rgb = DARK_GRAY
+                text_run.font.name = "Montserrat Light"  # Police normale en Montserrat Light
         
         # === SECTION LIVRABLES ===
         # Affichage des livrables seulement si disponibles
         if exp.livrables:
             # Titre de la section livrables
-            deliv_title = slide.shapes.add_textbox(Inches(0.5), Inches(7.2), Inches(6.5), Inches(0.3))
+            deliv_title = slide.shapes.add_textbox(Inches(0.5), Inches(6), Inches(6.5), Inches(0.3))
             deliv_title_frame = deliv_title.text_frame
             deliv_title_frame.text = "Livrables."
             deliv_title_para = deliv_title_frame.paragraphs[0]
-            deliv_title_para.font.size = Pt(16)  # Titre de section
+            deliv_title_para.font.size = Pt(12)  # Titre de section
             deliv_title_para.font.color.rgb = DEVOTEAM_RED
             deliv_title_para.font.bold = True
             deliv_title_para.font.name = "Montserrat"  # Titres en Montserrat normal
             
             # Liste des livrables avec bullet points PowerPoint
             # Conserver uniquement la première phrase de chaque livrable
-            deliv_content = "\n- ".join(self._truncate_at_first_dot(l) for l in exp.livrables)
-            deliv_box = slide.shapes.add_textbox(Inches(0.5), Inches(7.6), Inches(6.5), Inches(2.0))
+            deliv_box = slide.shapes.add_textbox(Inches(0.5), Inches(6.3), Inches(6.5), Inches(2.0))
             deliv_frame = deliv_box.text_frame
-            deliv_frame.text = f"- {deliv_content}"  # Commencer par un tiret
+            deliv_frame.clear()
             
-            # Application du style à chaque bullet point
-            for para in deliv_frame.paragraphs:
-                para.font.size = Pt(9)  # Taille 9 pour le texte normal
-                para.font.color.rgb = DARK_GRAY
-                para.font.name = "Montserrat Light"  # Texte normal en Montserrat Light
+            # Créer chaque livrable avec le même style que dans _create_title_slide
+            for i, livrable in enumerate(exp.livrables):
+                if i > 0:
+                    # Saut de ligne entre livrables
+                    para = deliv_frame.add_paragraph()
+                    para.text = ""
+                
+                # Afficher uniquement la première phrase de chaque livrable
+                if i == 0:
+                    para = deliv_frame.paragraphs[0]
+                else:
+                    para = deliv_frame.add_paragraph()
+                
+                # run pour le bullet (gras)
+                bullet_run = para.add_run()
+                bullet_run.text = "     •"
+                bullet_run.font.size = Pt(9)
+                bullet_run.font.color.rgb = DARK_GRAY
+                bullet_run.font.name = "Montserrat"
+                bullet_run.font.bold = True
+
+                # run pour le texte du livrable (normal)
+                text_run = para.add_run()
+                text_run.text = "       " + self._truncate_at_first_dot(livrable)
+                text_run.font.size = Pt(9)
+                text_run.font.color.rgb = DARK_GRAY
+                text_run.font.name = "Montserrat Light"  # Police normale en Montserrat Light
 
 
 def generate_devoteam_pptx(dossier: DossierCompetences) -> BytesIO:
