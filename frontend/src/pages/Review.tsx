@@ -21,16 +21,17 @@ export default function Review() {
   // Get session ID from URL parameters
   const sessionId = searchParams.get('session');
   const storageKey = sessionId ? `cv2dossier:lastDraft:${sessionId}` : STORAGE_KEYS.LAST_DRAFT;
-  const extractedData = storage.get(storageKey, null);
-  
+
   useEffect(() => {
-    if (!extractedData) {
+    const extracted = storage.get(storageKey, null);
+    if (!extracted) {
       toast.error('Aucune analyse trouvée');
       navigate('/');
       return;
     }
-    setDossierData(extractedData);
-  }, [extractedData, navigate]);
+    setDossierData(extracted);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
 
   const handleNewAnalysis = () => {
     // Clean up current session data
@@ -70,8 +71,7 @@ export default function Review() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header avec logo Devoteam */}
       <Header 
-        title="Dossier de Compétences" 
-        subtitle="Analyse Complète"
+        title="" 
         onNewAnalysis={handleNewAnalysis}
       />
 
@@ -84,41 +84,14 @@ export default function Review() {
             <div className="flex flex-col gap-4">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">Actions disponibles</h2>
-                <p className="text-gray-600 text-sm">Générez des documents professionnels ou copiez les sections individuellement</p>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600 flex-1">
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 bg-[#F8485D] rounded-full mt-2 flex-shrink-0"></div>
-                    <div>
-                      <strong className="text-gray-800">PDF :</strong> Document prêt à imprimer, conserve la mise en forme
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 bg-[#4285F4] rounded-full mt-2 flex-shrink-0"></div>
-                    <div>
-                      <strong className="text-gray-800">Google Docs :</strong> Fichier HTML à ouvrir et copier dans Google Docs
-                    </div>
-                  </div>
-                </div>
-                
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <ExportActions 
                     dossierData={dossierData} 
                     className="w-full sm:w-auto"
                   />
-                  <button
-                    onClick={handleNewAnalysis}
-                    className="
-                      bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold 
-                      py-3 px-6 rounded-xl transition-all duration-200 
-                      border border-gray-300 hover:border-gray-400
-                      w-full sm:w-auto
-                    "
-                  >
-                    Nouvelle analyse
-                  </button>
                 </div>
               </div>
             </div>

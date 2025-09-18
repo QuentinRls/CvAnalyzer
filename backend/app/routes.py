@@ -204,31 +204,8 @@ async def generate_google_docs(dossier: DossierCompetences):
     Returns:
         HTML content formatted for Google Docs import
     """
-    try:
-        from .renderer.google_docs_generator import generate_google_docs_html
-        
-        # Generate HTML content
-        html_content = generate_google_docs_html(dossier)
-        
-        # Prepare filename
-        nom_complet = f"{dossier.entete.prenom}_{dossier.entete.nom}".strip("_")
-        if not nom_complet:
-            nom_complet = "Dossier_Competences"
-        
-        filename = f"{nom_complet}_CV.html"
-        
-        logger.info(f"Successfully generated Google Docs HTML: {filename}")
-        
-        # Return HTML as streaming response
-        return StreamingResponse(
-            io.BytesIO(html_content.encode('utf-8')),
-            media_type="text/html",
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
-        )
-        
-    except Exception as e:
-        logger.error(f"Error generating Google Docs content: {e}")
-        raise HTTPException(status_code=500, detail=f"Google Docs generation failed: {str(e)}")
+    # Google Docs generation endpoint removed.
+    raise HTTPException(status_code=404, detail="Google Docs generation endpoint has been removed")
 
 
 @router.post("/generate-pptx")

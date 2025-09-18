@@ -1,32 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import devoteamLogo from '../images/devoteam.png';
+import Header from '../components/Header';
 
 export default function Home() {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50">
-      {/* Header avec logo Devoteam */}
-      <header className="relative bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-[75px] h-[75px] bg-white rounded-full flex items-center justify-center shadow-md border-2 border-gray-100">
-                <img 
-                  src={devoteamLogo} 
-                  alt="Devoteam" 
-                  className="w-12 h-12 object-contain"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Devoteam</h1>
-                <p className="text-sm text-gray-600">CV Intelligence</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Header avec logo Devoteam (composant partagé) */}
+      <Header
+        title=""
+      />
 
       {/* Hero Section */}
       <div className="relative overflow-hidden">
@@ -38,22 +23,22 @@ export default function Home() {
               onMouseLeave={() => setIsHovered(false)}
             >
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                Analyseur de CV
+                Dossier de Compétences<br></br> spécial
                 <span className={`text-[#F8485D] transition-all duration-300 ${isHovered ? 'scale-105' : ''}`}>
-                  {' '}Intelligent
+                  {' '}Devoteam
                 </span>
+                {' '}?
               </h1>
             </div>
             <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
-              Analysez automatiquement votre CV et obtenez une extraction structurée 
-              de vos données professionnelles grâce à l'intelligence artificielle.
+              Upload le CV la team ! 
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <Link 
                 to="/new" 
                 className="px-8 py-4 bg-[#F8485D] text-white rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 hover:shadow-xl active:scale-95 hover:bg-[#e63946]"
               >
-                Commencer maintenant
+                Allez clique !
               </Link>
             </div>
           </div>

@@ -93,8 +93,7 @@ export default function NewDossier() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50">
       <Header 
-        title="Nouvelle Analyse" 
-        subtitle="Importez votre CV pour commencer"
+        title=""
         onNewAnalysis={() => navigate('/')}
       />
       

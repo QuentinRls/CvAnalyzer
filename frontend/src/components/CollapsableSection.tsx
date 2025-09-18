@@ -18,14 +18,33 @@ export default function CollapsableSection({
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (contentRef.current) {
-      if (isExpanded) {
-        setHeight(contentRef.current.scrollHeight);
-      } else {
-        setHeight(0);
-      }
+    const el = contentRef.current;
+    if (!el) return;
+
+    const updateHeight = () => {
+      const newHeight = isExpanded ? el.scrollHeight : 0;
+      setHeight(prev => (prev === newHeight ? prev : newHeight));
+    };
+
+    // Update immediately
+    updateHeight();
+
+    // Observe size changes inside the content to adjust height when children change
+    let ro: ResizeObserver | null = null;
+    try {
+      ro = new ResizeObserver(() => {
+        // Recompute height if expanded
+        if (isExpanded) updateHeight();
+      });
+      ro.observe(el);
+    } catch (e) {
+      // ResizeObserver unsupported -> no-op
     }
-  }, [isExpanded, children]);
+
+    return () => {
+      if (ro) ro.disconnect();
+    };
+  }, [isExpanded]);
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);

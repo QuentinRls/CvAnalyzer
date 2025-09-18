@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import devoteamLogo from '../images/devoteam.png';
 
 interface HeaderProps {
@@ -10,7 +11,7 @@ export default function Header({ title, subtitle, onNewAnalysis }: HeaderProps) 
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center">
           {/* Logo et titre */}
           <div className="flex items-center space-x-4">
             {/* Logo Devoteam */}
@@ -37,18 +38,46 @@ export default function Header({ title, subtitle, onNewAnalysis }: HeaderProps) 
             </div>
           </div>
 
-          {/* Bouton nouvelle analyse */}
-          {onNewAnalysis && (
-            <button
-              onClick={onNewAnalysis}
-              className="px-4 py-2 bg-[#F8485D] text-white rounded-lg hover:bg-[#e63946] transition-colors duration-200 font-medium flex items-center space-x-2"
+          {/* Zone centrale : boutons centrés */}
+          <div className="flex-1 flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+            {/* Accueil */}
+            <Link
+              to="/"
+              className="inline-flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 text-gray-800 rounded-xl hover:bg-gray-200 transition-colors duration-150 text-sm"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              Accueil
+            </Link>
+
+            {/* Nouveau dossier / page */}
+            <Link
+              to="/new"
+              className="inline-flex items-center justify-center gap-2 px-3 py-2 bg-[#F8485D] text-white rounded-xl hover:bg-[#e63946] transition-colors duration-150 text-sm"
+            >
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              <span>Nouvelle Analyse</span>
+              <span>Nouveau</span>
+            </Link>
+
+            {/* Fonctionnalité future (placeholder) */}
+            <button
+              onClick={() => {
+                // Placeholder pour une fonctionnalité future
+              }}
+              disabled
+              title="Fonctionnalité à venir"
+                className="inline-flex items-center justify-center px-3 py-2 bg-gray-50 text-gray-400 rounded-xl border border-dashed border-gray-200 text-sm cursor-not-allowed"
+            >
+              À venir
             </button>
-          )}
+
+            {/* Le bouton 'Nouvelle Analyse' a été retiré (conservé uniquement la prop pour compatibilité) */}
+            </div>
+          </div>
+
+          {/* Espace droit réservé pour actions futures (actuellement vide) */}
+          <div className="w-24" />
         </div>
       </div>
     </div>
