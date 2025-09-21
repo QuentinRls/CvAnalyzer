@@ -2,23 +2,20 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home.tsx';
 import NewDossier from './pages/NewDossier.tsx';
 import Review from './pages/Review.tsx';
+import Compare from './pages/Compare.tsx';
+import CompareResult from './pages/CompareResult.tsx';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-xl font-semibold text-gray-900">
-            Dossier de Compétences - Analyseur CV
-          </h1>
-        </div>
-      </nav>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/new" element={<NewDossier />} />
           <Route path="/review" element={<Review />} />
+          <Route path="/compare" element={<Compare />} />
+          <Route path="/compare/result" element={<CompareResult />} />
         </Routes>
       </main>
     </div>

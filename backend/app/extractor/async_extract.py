@@ -103,11 +103,60 @@ async def extract_structured_async(cv_text: str = None, cv_file: Union[str, Path
             extracted = DossierCompetences(**extracted_dict)
             logger.info("Successfully validated extracted data with Pydantic")
             return extracted
-            
+
         except Exception as e:
-            logger.error(f"Pydantic validation failed: {e}")
+            # On validation failure, attempt light normalization for common type mismatches
+            logger.warning(f"Pydantic validation failed initially: {e}")
             logger.debug(f"Raw extracted data: {json.dumps(extracted_dict, indent=2)}")
-            raise LLMExtractionError(f"Data validation failed: {e}")
+
+            def coerce_list_to_string(value):
+                if isinstance(value, list):
+                    try:
+                        return ", ".join(str(x) for x in value if x is not None)
+                    except Exception:
+                        return str(value)
+                return value
+
+            try:
+                # Coerce competences_fonctionnelles.encadrement lists into a comma-separated string
+                cf = extracted_dict.get('competences_fonctionnelles')
+                if isinstance(cf, dict) and 'encadrement' in cf:
+                    cf['encadrement'] = coerce_list_to_string(cf.get('encadrement'))
+
+                # Coerce entete fields that should be strings
+                ent = extracted_dict.get('entete')
+                if isinstance(ent, dict):
+                    for k in ['intitule_poste', 'annees_experience', 'prenom', 'nom', 'resume_profil']:
+                        if k in ent:
+                            ent[k] = coerce_list_to_string(ent.get(k))
+
+                # Ensure experiences_cles_recentes is a list
+                ex_list = extracted_dict.get('experiences_cles_recentes')
+                if ex_list is None:
+                    extracted_dict['experiences_cles_recentes'] = []
+                elif isinstance(ex_list, dict):
+                    extracted_dict['experiences_cles_recentes'] = [ex_list]
+
+                # For each experience, ensure responsabilites is a list
+                for ex in extracted_dict.get('experiences_cles_recentes', []):
+                    if isinstance(ex, dict):
+                        resp = ex.get('responsabilites')
+                        if isinstance(resp, str):
+                            ex['responsabilites'] = [r.strip() for r in resp.split('\n') if r.strip()]
+
+                # Retry validation once
+                try:
+                    extracted = DossierCompetences(**extracted_dict)
+                    logger.info("Successfully validated extracted data after normalization")
+                    return extracted
+                except Exception as e2:
+                    logger.error(f"Pydantic validation still failed after normalization: {e2}")
+                    logger.debug(f"Normalized data: {json.dumps(extracted_dict, indent=2)[:2000]}")
+                    raise LLMExtractionError(f"Data validation failed after normalization: {e2}")
+
+            except Exception as norm_e:
+                logger.error(f"Error during normalization attempt: {norm_e}")
+                raise LLMExtractionError(f"Data validation failed and normalization attempt errored: {norm_e}")
             
     except LLMExtractionError:
         raise

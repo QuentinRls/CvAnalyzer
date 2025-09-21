@@ -51,9 +51,9 @@ export default function CollapsableSection({
   };
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-200 hover:shadow-md ${className}`}>
+    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-200 ${className}`}>
       <div 
-        className="px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100"
+        className="px-6 py-4 cursor-pointer border-b border-gray-100"
         onClick={toggleExpanded}
       >
         <div className="flex items-center justify-between">
@@ -62,7 +62,7 @@ export default function CollapsableSection({
             <span>{title}</span>
           </h2>
           <button 
-            className="p-2 rounded-lg hover:bg-gray-200 transition-all duration-200 transform hover:scale-105"
+            className="p-2 rounded-lg transition-all duration-200 transform"
             aria-label={isExpanded ? 'Réduire' : 'Développer'}
           >
             <svg 

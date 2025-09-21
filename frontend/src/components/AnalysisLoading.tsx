@@ -8,11 +8,11 @@ interface AnalysisLoadingProps {
 
 export default function AnalysisLoading({ stage, progress }: AnalysisLoadingProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4">
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4 force-white">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-[75px] h-[75px] bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-gray-100">
+          <div className="w-[75px] h-[75px] rounded-full flex items-center justify-center shadow-lg border-2 border-gray-100 force-white">
             <img 
               src={devoteamLogo} 
               alt="Devoteam" 

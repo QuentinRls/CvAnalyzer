@@ -1,6 +1,6 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException, BackgroundTasks, Request, Body
 from fastapi.responses import StreamingResponse
-from typing import Optional
+from typing import Optional, List
 import io
 from datetime import datetime
 
@@ -9,6 +9,7 @@ from .extractor import extract_structured
 from .extractor.async_extract import extract_structured_async, extract_from_text_async
 from .utils import logger, CVExtractionError, LLMExtractionError
 from .renderer.pdf_generator import generate_cv_pdf
+from .extractor.compare_async import compare_mission_with_cvs_async
 
 
 # Create router
@@ -239,3 +240,80 @@ async def generate_pptx(dossier: DossierCompetences):
     except Exception as e:
         logger.error(f"Error generating PowerPoint: {e}")
         raise HTTPException(status_code=500, detail=f"PowerPoint generation failed: {str(e)}")
+
+
+
+@router.post("/compare")
+async def compare_cvs_with_mission(
+    cvs: Optional[List[UploadFile]] = File(None),
+    mission: Optional[UploadFile] = File(None)
+) -> dict:
+    """Compare multiple CV files against a mission file and return ranked results.
+
+    Expects multipart/form-data with fields:
+    - cvs: multiple CV files
+    - mission: single mission file
+    """
+    try:
+        if not cvs or len(cvs) == 0:
+            raise HTTPException(status_code=400, detail="At least one CV file must be provided")
+        if mission is None:
+            raise HTTPException(status_code=400, detail="A mission file must be provided")
+
+        # Read mission text
+        mission_content = await mission.read()
+        if not mission_content:
+            raise HTTPException(status_code=400, detail="Empty mission file")
+
+        import io
+        from .extractor.ingest import read_cv
+
+        try:
+            mission_text = read_cv(io.BytesIO(mission_content))
+        except CVExtractionError as e:
+            logger.error(f"Failed to extract mission text: {e}")
+            raise HTTPException(status_code=400, detail=str(e))
+
+        if not mission_text or len(mission_text.strip()) < 50:
+            raise HTTPException(status_code=400, detail="Mission text too short (minimum 50 characters required)")
+
+        # For each CV, read and extract text (we'll keep a light summary object for LLM compare)
+        cvs_summaries = []
+        for f in cvs:
+            content = await f.read()
+            if not content:
+                continue
+            try:
+                text = read_cv(io.BytesIO(content))
+            except CVExtractionError as e:
+                logger.warning(f"Could not extract text from CV {f.filename}: {e}")
+                # Append a minimal placeholder so the compare step still has an identifier
+                cvs_summaries.append({"_filename": f.filename, "entete": {"resume_profil": ""}})
+                continue
+
+            # Keep lightweight structured extraction via async extractor
+            try:
+                extracted = await extract_from_text_async(text)
+                # attach filename to help identify results
+                d = extracted.dict()
+                d["_filename"] = f.filename
+                cvs_summaries.append(d)
+            except LLMExtractionError:
+                # If extraction fails for a CV, include minimal info so compare can still proceed
+                cvs_summaries.append({"_filename": f.filename, "entete": {"resume_profil": text[:200]}})
+
+        # Call compare LLM
+        try:
+            results = await compare_mission_with_cvs_async(mission_text, cvs_summaries)
+        except LLMExtractionError as le:
+            logger.error(f"LLM extraction/compare failed: {le}")
+            raise HTTPException(status_code=500, detail=f"LLM compare failed: {str(le)}")
+
+        return results
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Return the exception message in dev to aid debugging
+        logger.exception(f"Error in compare endpoint: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

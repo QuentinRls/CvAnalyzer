@@ -1,11 +1,19 @@
 import { useState, useRef, DragEvent } from 'react';
+import FadeIn from './FadeIn';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
+  onFilesSelect?: (files: File[]) => void;
   disabled?: boolean;
+  multiple?: boolean;
+  accept?: string;
+  primaryText?: string; // main title when not dragging
+  browseText?: string; // clickable part
+  supportedText?: string; // small helper text about formats
+  maxSizeText?: string; // small helper text about max size
 }
 
-export default function FileUpload({ onFileSelect, disabled }: FileUploadProps) {
+export default function FileUpload({ onFileSelect, onFilesSelect, disabled, multiple, accept, primaryText, browseText, supportedText, maxSizeText }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,28 +34,64 @@ export default function FileUpload({ onFileSelect, disabled }: FileUploadProps) 
     
     if (disabled) return;
     
-    const files = Array.from(e.dataTransfer.files);
-    const file = files[0];
-    
-    if (file && isValidFile(file)) {
-      onFileSelect(file);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length === 0) return;
+
+    if (disabled) return;
+
+    const valid = files.filter(isValidFile);
+    if (multiple) {
+      if (onFilesSelect && valid.length > 0) {
+        onFilesSelect(valid);
+        return;
+      }
+
+      // Fallback: call onFileSelect for each valid file so existing single-file handlers can accept multiple
+      for (const f of valid) {
+        onFileSelect(f);
+      }
+      return;
     }
+
+    const file = valid[0];
+    if (file) onFileSelect(file);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && isValidFile(file)) {
-      onFileSelect(file);
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length === 0) return;
+
+    const valid = files.filter(isValidFile);
+    if (multiple) {
+      if (onFilesSelect && valid.length > 0) {
+        onFilesSelect(valid);
+        return;
+      }
+
+      for (const f of valid) {
+        onFileSelect(f);
+      }
+      return;
     }
+
+    const file = valid[0];
+    if (file) onFileSelect(file);
   };
 
   const isValidFile = (file: File) => {
-    const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-    const validExtensions = ['.pdf', '.docx', '.txt'];
-    
+    const validTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain'
+    ];
+    const validExtensions = ['.pdf', '.docx', '.doc', '.pptx', '.txt'];
+
     const hasValidType = validTypes.includes(file.type);
     const hasValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-    
+
     return hasValidType || hasValidExtension;
   };
 
@@ -57,15 +101,19 @@ export default function FileUpload({ onFileSelect, disabled }: FileUploadProps) 
     }
   };
 
+  const acceptTypes = accept ?? '.pdf,.docx,.txt';
+
   return (
     <div className="relative">
+      <FadeIn>
       <input
         ref={fileInputRef}
         type="file"
-        accept=".pdf,.docx,.txt"
+        accept={acceptTypes}
         onChange={handleFileChange}
         className="hidden"
         disabled={disabled}
+        multiple={!!multiple}
       />
       
       <div
@@ -111,18 +159,18 @@ export default function FileUpload({ onFileSelect, disabled }: FileUploadProps) 
           <h3 className={`text-lg font-semibold transition-colors duration-300 ${
             isDragging || isHovered ? 'text-[#F8485D]' : 'text-gray-700'
           }`}>
-            {isDragging ? 'Déposez votre fichier ici' : 'Glissez-déposez votre CV'}
+            {isDragging ? 'Déposez votre fichier ici' : (primaryText ?? 'Glissez-déposez votre CV')}
           </h3>
           
           <p className="text-gray-600">
             ou <span className={`font-medium transition-colors duration-300 ${
               isHovered ? 'text-[#F8485D]' : 'text-blue-600'
-            }`}>cliquez pour parcourir</span>
+            }`}>{browseText ?? 'cliquez pour parcourir'}</span>
           </p>
           
           <div className="text-sm text-gray-500 space-y-1">
-            <p>Formats supportés : PDF, DOCX, TXT</p>
-            <p>Taille maximum : 10 MB</p>
+            <p>{supportedText ?? 'Formats supportés : PDF, DOCX, TXT'}</p>
+            <p>{maxSizeText ?? 'Taille maximum : 10 MB'}</p>
           </div>
         </div>
 
@@ -137,6 +185,7 @@ export default function FileUpload({ onFileSelect, disabled }: FileUploadProps) 
       </div>
 
       {/* Indicateur de statut */}
+      </FadeIn>
       {isDragging && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#F8485D] bg-opacity-10 rounded-2xl">
           <div className="bg-white px-4 py-2 rounded-lg shadow-lg border-2 border-[#F8485D]">

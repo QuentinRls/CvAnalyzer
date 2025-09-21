@@ -7,6 +7,15 @@ import App from './App'
 import { queryClient } from './lib/query.ts'
 import './app.css'
 
+// Always hide page scrollbar (global UX decision)
+try {
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.classList.add('hide-scrollbar');
+  }
+} catch (e) {
+  // ignore
+}
+
 // Force rebuild - session isolation fix v2.0
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

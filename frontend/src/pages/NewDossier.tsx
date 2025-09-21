@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { postExtract } from '../lib/api.ts';
 import { storage, STORAGE_KEYS, errorHelpers, generateSessionKeys } from '../lib/utils.ts';
 import Header from '../components/Header';
+import FadeIn from '../components/FadeIn';
 import AnalysisLoading from '../components/AnalysisLoading';
 import FileUpload from '../components/FileUpload';
 
@@ -91,7 +92,7 @@ export default function NewDossier() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
       <Header 
         title=""
         onNewAnalysis={() => navigate('/')}
@@ -148,13 +149,15 @@ export default function NewDossier() {
                   <span className={`text-sm ${textInput.length >= 50 ? 'text-green-600' : 'text-gray-500'}`}>
                     {textInput.length} caractères {textInput.length >= 50 ? '✓' : `(minimum 50)`}
                   </span>
-                  <button
-                    onClick={handleTextSubmit}
-                    disabled={loading || textInput.length < 50}
-                    className="px-6 py-3 bg-[#F8485D] text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  >
-                    Analyser le texte
-                  </button>
+                  <FadeIn duration={0.3}>
+                    <button
+                      onClick={handleTextSubmit}
+                      disabled={loading || textInput.length < 50}
+                      className="px-6 py-3 bg-[#F8485D] text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    >
+                      Analyser le texte
+                    </button>
+                  </FadeIn>
                 </div>
               </div>
             </div>

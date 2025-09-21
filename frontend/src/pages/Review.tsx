@@ -80,10 +80,12 @@ export default function Review() {
         <div className="max-w-5xl mx-auto space-y-8">
           
           {/* Actions principales */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
-            <div className="flex flex-col gap-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-red-50">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Actions disponibles</h2>
+            </div>
+            <div className="p-6 flex flex-col gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">Actions disponibles</h2>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
