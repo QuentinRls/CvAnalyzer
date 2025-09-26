@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Union
+from datetime import datetime
 
 
 # En-tête
@@ -95,3 +96,30 @@ class CVTextRequest(BaseModel):
 class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
+
+
+# Authentication schemas
+class User(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: str
+    email: str
+    name: str
+    picture: Optional[str] = None
+    given_name: Optional[str] = None
+    family_name: Optional[str] = None
+    created_at: datetime
+    last_login: datetime
+
+
+class UserSession(BaseModel):
+    user_id: str
+    session_token: str
+    expires_at: datetime
+    created_at: datetime
+
+
+class AuthResponse(BaseModel):
+    user: User
+    session_token: str
+    message: str

@@ -122,6 +122,19 @@ export default function Header({ title, subtitle, onNewAnalysis }: HeaderProps) 
                   </Link>
               </FadeIn>
 
+              {/* Historique CV */}
+              <FadeIn delay={1.0} duration={0.9}>
+                  <Link
+                    to="/history"
+                    className="inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-150 text-sm"
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Mes CV</span>
+                  </Link>
+              </FadeIn>
+
               {/* Nouveau dossier / page */}
               {showNewButton && (
                 <FadeIn delay={1.4} duration={0.9}>
@@ -162,36 +175,7 @@ export default function Header({ title, subtitle, onNewAnalysis }: HeaderProps) 
                 )}
               </button>
               </FadeIn>
-              {/* Toggle animations button */}
-              <FadeIn delay={7} duration={1.2}>
-              <button
-                onClick={() => {
-                  try {
-                    const disabled = localStorage.getItem('animations') === 'off';
-                    if (!disabled) {
-                      // disable: kill GSAP tweens and ScrollTriggers and persist
-                      gsap.killTweensOf('*');
-                      ScrollTrigger.getAll().forEach((st) => st.kill());
-                      localStorage.setItem('animations', 'off');
-                      // also clear any lingering timeline
-                      gsap.globalTimeline.clear();
-                    } else {
-                      // enable: remove flag and reload to reinitialize animations
-                      localStorage.removeItem('animations');
-                      window.location.reload();
-                    }
-                  } catch (e) {
-                    // ignore
-                  }
-                }}
-                title="Enlever / remettre les animations"
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-gray-800" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M3 3h14v2H3V3zm0 4h14v2H3V7zm0 4h14v2H3v-2zm0 4h14v2H3v-2z" />
-                </svg>
-              </button>
-              </FadeIn>
+
               {/* scrollbar is hidden globally by default (no per-user button) */}
             </div>
           </div>

@@ -26,7 +26,7 @@ export interface ApiError {
 }
 
 class ApiClient {
-  private baseUrl: string;
+  public baseUrl: string;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
@@ -48,6 +48,34 @@ class ApiClient {
     }
   }
 
+  async get<T>(url: string, options?: RequestInit): Promise<{ data: T }> {
+    const response = await fetch(`${this.baseUrl}${url}`, {
+      method: 'GET',
+      credentials: 'include',
+      ...options
+    });
+    const data = await this.handleResponse<T>(response);
+    return { data };
+  }
+
+  async post<T>(url: string, body?: any, options?: RequestInit): Promise<{ data: T }> {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...(options?.headers || {})
+    };
+
+    const response = await fetch(`${this.baseUrl}${url}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      ...options
+    });
+
+    const data = await this.handleResponse<T>(response);
+    return { data };
+  }
+
   async postExtract(input: File | string) {
     if (input instanceof File) {
       const formData = new FormData();
@@ -55,6 +83,7 @@ class ApiClient {
       
       const response = await fetch(`${this.baseUrl}/api/v1/extract`, {
         method: 'POST',
+        credentials: 'include',
         body: formData
       });
       
@@ -62,6 +91,7 @@ class ApiClient {
     } else {
       const response = await fetch(`${this.baseUrl}/api/v1/extract-text`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -75,6 +105,7 @@ class ApiClient {
   async generatePDF(dossierData: any) {
     const response = await fetch(`${this.baseUrl}/api/v1/generate-pdf`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -95,6 +126,7 @@ class ApiClient {
   async generatePowerPoint(dossierData: any) {
     const response = await fetch(`${this.baseUrl}/api/v1/generate-pptx`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -112,6 +144,22 @@ class ApiClient {
     return response.blob();
   }
 
+  async getStats() {
+    const response = await fetch(`${this.baseUrl}/api/v1/stats`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return this.handleResponse<{
+      total_analyses: number;
+      successful_analyses: number;
+      failed_analyses: number;
+      pending_analyses: number;
+    }>(response);
+  }
+
   async healthCheck() {
     const response = await fetch(`${this.baseUrl}/api/v1/health`);
     return this.handleResponse<{ status: string; service: string }>(response);
@@ -124,6 +172,7 @@ export const apiClient = new ApiClient(API_BASE);
 export const postExtract = (input: File | string) => apiClient.postExtract(input);
 export const generatePDF = (dossierData: any) => apiClient.generatePDF(dossierData);
 export const generatePowerPoint = (dossierData: any) => apiClient.generatePowerPoint(dossierData);
+export const getStats = () => apiClient.getStats();
 export const healthCheck = () => apiClient.healthCheck();
 export const getCompanyLogo = (companyName: string) => {
   // Fonction placeholder pour récupérer le logo d'une entreprise

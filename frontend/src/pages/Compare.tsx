@@ -77,7 +77,21 @@ export default function Compare() {
   setLoading(true);
   const progressInterval = simulateProgress();
     try {
-      const baseUrl = (import.meta as any).env && (import.meta as any).env.DEV ? 'http://localhost:8000' : '';
+      // Configuration de l'API dynamique
+      const getApiBase = () => {
+        if (import.meta.env.VITE_API_URL) {
+          return import.meta.env.VITE_API_URL;
+        }
+        if (typeof window !== 'undefined') {
+          const hostname = window.location.hostname;
+          if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+            return window.location.origin;
+          }
+        }
+        return 'http://localhost:8000';
+      };
+      
+      const baseUrl = getApiBase();
       const resp = await fetch(`${baseUrl}/api/v1/compare`, {
         method: 'POST',
         body: form
