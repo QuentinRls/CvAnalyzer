@@ -39,8 +39,11 @@ class GoogleAuthService:
         ]
         
         # URL de redirection depuis l'environnement
-        backend_url = os.getenv('BACKEND_URL', 'http://localhost:8000')
-        self.redirect_uri = f'{backend_url}/api/auth/callback'
+        # Priorité : OAUTH_REDIRECT_URI (Railway) > BACKEND_URL/api/auth/callback (local)
+        self.redirect_uri = os.getenv('OAUTH_REDIRECT_URI')
+        if not self.redirect_uri:
+            backend_url = os.getenv('BACKEND_URL', 'http://localhost:8000')
+            self.redirect_uri = f'{backend_url}/api/auth/callback'
     
     def get_authorization_url(self, state: Optional[str] = None) -> Tuple[str, str]:
         """
