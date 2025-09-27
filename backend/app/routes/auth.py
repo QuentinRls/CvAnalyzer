@@ -10,7 +10,6 @@ import os
 
 from ..auth import google_auth_service
 from ..db_auth_service import db_auth_service
-from ..simple_auth import simple_auth_service
 from ..schemas import User, AuthResponse
 from ..utils.logger import logger
 
@@ -34,15 +33,8 @@ async def login():
         # Générer un état de sécurité
         state = secrets.token_urlsafe(32)
         
-        # Obtenir l'URL d'autorisation Google - essayer le service normal puis le simplifié
-        try:
-            auth_url, _ = google_auth_service.get_authorization_url(state)
-        except Exception as e:
-            if "greenlet" in str(e).lower() or "libstdc" in str(e).lower():
-                logger.warning(f"Erreur greenlet détectée au login, utilisation du service simplifié: {e}")
-                auth_url, _ = simple_auth_service.get_authorization_url(state)
-            else:
-                raise e
+        # Obtenir l'URL d'autorisation Google
+        auth_url, _ = google_auth_service.get_authorization_url(state)
         
         # Stocker l'état temporairement
         oauth_states[state] = True
@@ -72,16 +64,8 @@ async def callback(code: str, state: str, response: Response):
         # Supprimer l'état utilisé
         del oauth_states[state]
         
-        # Traiter le callback - essayer d'abord le service normal, puis le simplifié si erreur greenlet
-        try:
-            auth_response = await google_auth_service.complete_oauth_callback(code, state)
-        except Exception as db_error:
-            if "greenlet" in str(db_error).lower() or "libstdc" in str(db_error).lower():
-                logger.warning(f"Erreur greenlet détectée, utilisation du service simplifié: {db_error}")
-                # Utiliser le service simplifié sans base de données
-                auth_response = simple_auth_service.complete_oauth_callback(code, state)
-            else:
-                raise db_error
+        # Traiter le callback
+        auth_response = await google_auth_service.complete_oauth_callback(code, state)
         
         # Définir le cookie de session
         response.set_cookie(

@@ -1,10 +1,13 @@
 [phases.setup]
-nixPkgs = ["nodejs_18", "python311", "wget", "curl", "gcc", "pkg-config", "glibc", "libgcc"]
+nixPkgs = ["nodejs_18", "python311", "wget", "curl", "gcc", "pkg-config", "stdenv"]
 
 [phases.install]
 cmds = [
+  "export CC=gcc",
+  "export CXX=g++", 
   "curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py",
   "python3 get-pip.py --break-system-packages",
+  "python3 -m pip install --break-system-packages --force-reinstall --no-binary=greenlet greenlet",
   "python3 -m pip install --break-system-packages -r requirements.txt",
   "cd frontend && npm ci"
 ]
