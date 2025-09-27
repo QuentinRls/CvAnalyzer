@@ -66,6 +66,21 @@ except Exception as e:
     logger.error(f"Type d'erreur: {type(e).__name__}")
     import traceback
     logger.error(f"Traceback: {traceback.format_exc()}")
+    
+    # Routes de secours pour le debugging
+    from fastapi import APIRouter
+    fallback_router = APIRouter(prefix="/auth", tags=["Authentication Fallback"])
+    
+    @fallback_router.get("/login")
+    async def fallback_login():
+        return {"error": "Auth system not properly configured", "detail": str(e)}
+    
+    @fallback_router.get("/status") 
+    async def fallback_status():
+        return {"authenticated": False, "error": "Auth system not configured"}
+    
+    app.include_router(fallback_router, prefix="/api")
+    logger.info("Routes d'authentification de secours chargées")
 
 @app.get("/api")
 async def root():
@@ -88,6 +103,18 @@ async def debug_routes():
                 "name": getattr(route, 'name', 'Unknown')
             })
     return {"routes": routes}
+
+@app.get("/api/debug/env")
+async def debug_env():
+    """Debug endpoint to check environment variables"""
+    return {
+        "google_client_id_set": bool(os.getenv('GOOGLE_CLIENT_ID')),
+        "google_client_secret_set": bool(os.getenv('GOOGLE_CLIENT_SECRET')),
+        "database_url_set": bool(os.getenv('DATABASE_URL')),
+        "openai_api_key_set": bool(os.getenv('OPENAI_API_KEY')),
+        "backend_url": os.getenv('BACKEND_URL', 'not set'),
+        "oauth_redirect_uri": os.getenv('OAUTH_REDIRECT_URI', 'not set')
+    }
 
 
 @app.get("/health")
