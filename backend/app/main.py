@@ -58,8 +58,14 @@ try:
     from .routes.auth import router as auth_router
     app.include_router(auth_router, prefix="/api")
     logger.info("Routes d'authentification chargées avec succès")
+    logger.info("Routes auth disponibles:")
+    for route in auth_router.routes:
+        logger.info(f"  - {route.methods if hasattr(route, 'methods') else 'GET'} /api{route.path}")
 except Exception as e:
-    logger.error(f"Erreur lors du chargement des routes d'authentification: {e}")
+    logger.error(f"❌ ERREUR CRITIQUE: Échec du chargement des routes d'authentification: {e}")
+    logger.error(f"Type d'erreur: {type(e).__name__}")
+    import traceback
+    logger.error(f"Traceback: {traceback.format_exc()}")
 
 @app.get("/api")
 async def root():

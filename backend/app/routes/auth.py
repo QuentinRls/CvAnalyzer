@@ -25,6 +25,11 @@ oauth_states = {}
 async def login():
     """Initier la connexion Google OAuth"""
     try:
+        # Vérifier que Google OAuth est configuré
+        if not google_auth_service.is_configured:
+            logger.error("Google OAuth non configuré - vérifiez GOOGLE_CLIENT_ID et GOOGLE_CLIENT_SECRET")
+            raise HTTPException(status_code=500, detail="Authentification non configurée")
+        
         # Générer un état de sécurité
         state = secrets.token_urlsafe(32)
         

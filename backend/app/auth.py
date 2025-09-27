@@ -29,7 +29,12 @@ class GoogleAuthService:
         self.project_id = os.getenv('GOOGLE_PROJECT_ID')
         
         if not all([self.client_id, self.client_secret]):
-            raise ValueError("Variables d'environnement Google OAuth manquantes")
+            logger.error("Variables d'environnement Google OAuth manquantes - l'authentification sera désactivée")
+            logger.error(f"GOOGLE_CLIENT_ID: {'✅' if self.client_id else '❌'}")
+            logger.error(f"GOOGLE_CLIENT_SECRET: {'✅' if self.client_secret else '❌'}")
+            self.is_configured = False
+        else:
+            self.is_configured = True
         
         # Scopes nécessaires pour récupérer les infos utilisateur
         self.scopes = [
