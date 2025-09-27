@@ -116,6 +116,38 @@ async def debug_env():
         "oauth_redirect_uri": os.getenv('OAUTH_REDIRECT_URI', 'not set')
     }
 
+@app.get("/api/debug/imports")
+async def debug_imports():
+    """Debug endpoint to test imports"""
+    results = {}
+    
+    # Test individual imports
+    try:
+        from .auth import GoogleAuthService
+        results["auth_service"] = "✅ OK"
+    except Exception as e:
+        results["auth_service"] = f"❌ {str(e)}"
+    
+    try:
+        from .db_auth_service import db_auth_service
+        results["db_auth_service"] = "✅ OK"
+    except Exception as e:
+        results["db_auth_service"] = f"❌ {str(e)}"
+    
+    try:
+        from .routes.auth import router
+        results["auth_routes"] = f"✅ OK - {len(router.routes)} routes"
+    except Exception as e:
+        results["auth_routes"] = f"❌ {str(e)}"
+    
+    try:
+        from . import cv_routes
+        results["cv_routes"] = f"✅ OK - {len(cv_routes.router.routes)} routes"
+    except Exception as e:
+        results["cv_routes"] = f"❌ {str(e)}"
+    
+    return results
+
 
 @app.get("/health")
 async def health_check():
@@ -185,8 +217,8 @@ async def startup_event():
     """Startup event handler"""
     logger.info("CV2Dossier API starting up...")
     
-    # Auto-migrate database on startup (for Railway deployment)
-    await run_migrations()
+    # Désactivé temporairement pour debug Railway
+    # await run_migrations()
     
     # Validate environment
     if not os.getenv("OPENAI_API_KEY"):
