@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_18", "python311", "wget", "curl", "gcc", "pkg-config"]
+nixPkgs = ["nodejs_18", "python311", "wget", "curl", "gcc", "pkg-config", "glibc", "libgcc"]
 
 [phases.install]
 cmds = [
@@ -11,3 +11,6 @@ cmds = [
 
 [phases.build]
 cmds = ["cd frontend && npm run build"]
+
+[start]
+cmd = "LD_LIBRARY_PATH=/nix/store/*/lib:$LD_LIBRARY_PATH uvicorn app.main:app --host 0.0.0.0 --port $PORT"
