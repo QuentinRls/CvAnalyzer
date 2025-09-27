@@ -185,7 +185,7 @@ async def general_exception_handler(request, exc):
 
 
 async def run_migrations():
-    """Run Alembic migrations automatically"""
+    """Run Alembic migrations automatically with fallback"""
     try:
         logger.info("Running database migrations...")
         
@@ -200,16 +200,42 @@ async def run_migrations():
             text=True
         )
         
+        logger.info(f"Migration command output: {result.stdout}")
+        if result.stderr:
+            logger.info(f"Migration command stderr: {result.stderr}")
+        
         if result.returncode == 0:
-            logger.info("Database migrations completed successfully")
-            logger.debug(f"Migration output: {result.stdout}")
+            logger.info("✅ Database migrations completed successfully")
         else:
-            logger.error(f"Migration failed: {result.stderr}")
-            # Don't raise exception to allow app to start even if migrations fail
+            logger.error(f"❌ Migration failed with return code {result.returncode}")
+            logger.error(f"Migration stderr: {result.stderr}")
+            
+            # Essayer de créer les tables directement
+            await create_tables_fallback()
             
     except Exception as e:
         logger.error(f"Error running migrations: {e}")
-        # Don't raise exception to allow app to start even if migrations fail
+        # Essayer de créer les tables directement
+        await create_tables_fallback()
+
+
+async def create_tables_fallback():
+    """Créer les tables directement si les migrations échouent"""
+    try:
+        logger.info("Tentative de création directe des tables...")
+        
+        from .database import engine
+        from .models import Base
+        
+        # Créer toutes les tables
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        
+        logger.info("✅ Tables créées directement avec succès")
+        
+    except Exception as e:
+        logger.error(f"❌ Erreur lors de la création directe des tables: {e}")
+        # Ne pas lever d'exception pour permettre à l'app de démarrer
 
 
 @app.on_event("startup")
@@ -217,8 +243,8 @@ async def startup_event():
     """Startup event handler"""
     logger.info("CV2Dossier API starting up...")
     
-    # Désactivé temporairement pour debug Railway
-    # await run_migrations()
+    # Exécuter les migrations automatiquement
+    await run_migrations()
     
     # Validate environment
     if not os.getenv("OPENAI_API_KEY"):
