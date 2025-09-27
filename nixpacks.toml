@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_18", "python311", "wget", "curl"]
+nixPkgs = ["nodejs_18", "python311", "wget", "curl", "gcc", "glibc", "stdenv.cc.cc.lib"]
 
 [phases.install]
 cmds = [
