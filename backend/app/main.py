@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import os
+import subprocess
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -54,9 +56,7 @@ except Exception as e:
 # Include auth routes separately
 try:
     from .routes.auth import router as auth_router
-    from .routes.protected import router as protected_router
     app.include_router(auth_router, prefix="/api")
-    app.include_router(protected_router, prefix="")
     logger.info("Routes d'authentification chargées avec succès")
 except Exception as e:
     logger.error(f"Erreur lors du chargement des routes d'authentification: {e}")
@@ -69,6 +69,19 @@ async def root():
         "version": "0.1.0",
         "docs": "/docs"
     }
+
+@app.get("/debug/routes")
+async def debug_routes():
+    """Debug endpoint to list all routes"""
+    routes = []
+    for route in app.routes:
+        if hasattr(route, 'path') and hasattr(route, 'methods'):
+            routes.append({
+                "path": route.path,
+                "methods": list(route.methods) if route.methods else [],
+                "name": getattr(route, 'name', 'Unknown')
+            })
+    return {"routes": routes}
 
 
 @app.get("/health")
@@ -106,10 +119,41 @@ async def general_exception_handler(request, exc):
     )
 
 
+async def run_migrations():
+    """Run Alembic migrations automatically"""
+    try:
+        logger.info("Running database migrations...")
+        
+        # Get the backend directory path
+        backend_dir = Path(__file__).parent.parent
+        
+        # Run Alembic upgrade
+        result = subprocess.run(
+            [sys.executable, "-m", "alembic", "upgrade", "head"],
+            cwd=backend_dir,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0:
+            logger.info("Database migrations completed successfully")
+            logger.debug(f"Migration output: {result.stdout}")
+        else:
+            logger.error(f"Migration failed: {result.stderr}")
+            # Don't raise exception to allow app to start even if migrations fail
+            
+    except Exception as e:
+        logger.error(f"Error running migrations: {e}")
+        # Don't raise exception to allow app to start even if migrations fail
+
+
 @app.on_event("startup")
 async def startup_event():
     """Startup event handler"""
     logger.info("CV2Dossier API starting up...")
+    
+    # Auto-migrate database on startup (for Railway deployment)
+    await run_migrations()
     
     # Validate environment
     if not os.getenv("OPENAI_API_KEY"):
