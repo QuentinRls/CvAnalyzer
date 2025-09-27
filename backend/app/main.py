@@ -157,11 +157,45 @@ async def health_check():
 
 
 
-# Configuration pour servir les fichiers statiques du frontend
-# IMPORTANT: Ceci doit être APRÈS toutes les routes API
+# Route catch-all pour SPA (doit être AVANT le mount des fichiers statiques)
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """Serve SPA for all non-API routes"""
+    # Si c'est une route API, ne pas intercepter
+    if full_path.startswith('api/') or full_path.startswith('docs') or full_path.startswith('redoc') or full_path.startswith('debug/') or full_path == 'health':
+        # Laisser FastAPI gérer les 404 pour les routes API
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Not found")
+    
+    # Pour toutes les autres routes, servir index.html (SPA routing)
+    frontend_dist_path = Path(__file__).parent.parent.parent / "frontend" / "dist"
+    index_path = frontend_dist_path / "index.html"
+    
+    if index_path.exists():
+        from fastapi.responses import FileResponse
+        return FileResponse(index_path, media_type='text/html')
+    else:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Frontend not found")
+
+
+# Configuration pour servir les fichiers statiques du frontend (assets, etc.)
+# IMPORTANT: Ceci doit être APRÈS la route catch-all
 frontend_dist_path = Path(__file__).parent.parent.parent / "frontend" / "dist"
 if frontend_dist_path.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_dist_path), html=True), name="frontend")
+    # Monter les assets (CSS, JS, images)
+    app.mount("/assets", StaticFiles(directory=str(frontend_dist_path / "assets")), name="assets")
+    
+    # Route pour les fichiers à la racine (comme devoteam.png)
+    @app.get("/devoteam.png")
+    async def serve_logo():
+        logo_path = frontend_dist_path / "devoteam.png"
+        if logo_path.exists():
+            from fastapi.responses import FileResponse
+            return FileResponse(logo_path, media_type='image/png')
+        else:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Logo not found")
 
 
 @app.exception_handler(HTTPException)
